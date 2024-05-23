@@ -13,14 +13,11 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 public class JsonEpisodeFetcher {
     public void fff() {
-        String url = "https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de-DE/stories?slug=seasonal-lineup%2F2024%2F4%2F1%2Fcrunchyroll-wochenprogramm-fruehling-2024"; // Ersetze
-                                                                                                                                                                            // durch
-                                                                                                                                                                            // die
-                                                                                                                                                                            // tatsächliche
-                                                                                                                                                                            // URL
+        String url = "https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de-DE/stories?slug=seasonal-lineup%2F2024%2F4%2F1%2Fcrunchyroll-wochenprogramm-fruehling-2024";
 
         // Erzeuge HttpClient
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -49,6 +46,7 @@ public class JsonEpisodeFetcher {
 
                         if (bodyNode.isArray()) {
                             FileWriter writer = new FileWriter("output.json");
+                            EnumWeekdays weekday = null;
 
                             for (int i = 6; i < bodyNode.size(); i++) {
                                 JsonNode elementNode = bodyNode.get(i);
@@ -56,18 +54,23 @@ public class JsonEpisodeFetcher {
 
                                 try {
                                     JsonNode weekdayNode = elementNode.get("content").get("content").get(0).get("content").get(0).get("text");
-                                    EnumWeekdays weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
+                                    weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
                                     if (weekday == null){ break;}
                                     
                                     System.out.println(weekday.getGermanName()); 
                                     continue;
                                 } catch (NullPointerException e) {
-                                    System.out.println("skip weekday");
+                                    // System.out.println("skip weekday");
                                 }
                                 try {
                                     JsonNode animeEpisodeNode = elementNode.get("items");
                                     for (JsonNode animeEpisode : animeEpisodeNode) {
-                                        // String animeHTML = animeEpisode.get("table").get("content").toString();
+                                        String animeHTML = animeEpisode.get("table").get("content").toString();
+
+                                        List<Anime> animeList = AnimeInfoExtractor.extractAnime(animeHTML, weekday.getGermanName());
+                                        for (Anime anime : animeList) {
+                                            System.out.println(anime.toString());
+                                        }
                                         // System.out.println(animeHTML);
                                     }
                                     continue;
@@ -78,7 +81,7 @@ public class JsonEpisodeFetcher {
                                     JsonNode horizontalLineNode = elementNode.get("content").get("content").get(0).get("type");
                                     continue;
                                 } catch (NullPointerException e) {
-                                    System.out.println("skip horizontal");
+                                    // System.out.println("skip horizontal");
                                 }                          
                             }
                             writer.close();
