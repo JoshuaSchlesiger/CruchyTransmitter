@@ -1,11 +1,12 @@
 package de.milschschnitte.crunchytransmitter.reciever;
 
 public class Anime {
-    String Title;
-    String Episode;
-    String ReleaseTime;
-    String Weekday;
-    String TimestampOfWeekday;
+    private String Title;
+    private String Episode;
+    private String ReleaseTime;
+    private String Weekday;
+    private String TimestampOfWeekday;
+    private String CorretionDate;
 
     public Anime(){
         this.Title = "";
@@ -13,6 +14,7 @@ public class Anime {
         this.ReleaseTime = "";
         this.Weekday = "";
         this.TimestampOfWeekday = "";
+        this.CorretionDate = "";
     }
 
     public void setTitle(String Title){
@@ -31,6 +33,18 @@ public class Anime {
         this.Weekday = Weekday;
     }
 
+    public void setCorretionDate(String CorretionDate){
+        this.CorretionDate = CorretionDate;
+    }
+
+    public String getEpisode(){
+        return this.Episode;
+    }
+
+    public String getReleaseTime(){
+        return this.ReleaseTime;
+    }
+
     @Override
     public String toString() {
         return "Anime{" +
@@ -39,6 +53,7 @@ public class Anime {
                 ", ReleaseTime='" + ReleaseTime + '\'' +
                 ", Weekday='" + Weekday + '\'' +
                 ", TimestampOfWeekday='" + TimestampOfWeekday + '\'' +
+                ", CorretionDate='" + CorretionDate + '\'' +
                 '}';
     }
 }

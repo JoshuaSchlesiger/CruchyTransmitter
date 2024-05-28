@@ -48,20 +48,25 @@ public class JsonEpisodeFetcher {
                             FileWriter writer = new FileWriter("output.json");
                             EnumWeekdays weekday = null;
 
-                            for (int i = 6; i < bodyNode.size(); i++) {
+                            Boolean mondayFound = false;
+
+                            for (int i = 1; i < bodyNode.size(); i++) {
                                 JsonNode elementNode = bodyNode.get(i);
                                 writer.write(elementNode.toPrettyString());
-
                                 try {
                                     JsonNode weekdayNode = elementNode.get("content").get("content").get(0).get("content").get(0).get("text");
                                     weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
-                                    if (weekday == null){ break;}
+                                    if (weekday == null) continue;
+                                    if (weekday == EnumWeekdays.MONDAY) mondayFound = true;
                                     
                                     System.out.println(weekday.getGermanName()); 
                                     continue;
                                 } catch (NullPointerException e) {
                                     // System.out.println("skip weekday");
                                 }
+
+                                if(mondayFound == false) continue;
+
                                 try {
                                     JsonNode animeEpisodeNode = elementNode.get("items");
                                     for (JsonNode animeEpisode : animeEpisodeNode) {
