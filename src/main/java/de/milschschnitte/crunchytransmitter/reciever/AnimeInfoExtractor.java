@@ -17,6 +17,14 @@ public class AnimeInfoExtractor {
 
         // Extracting data
         Elements rows = doc.select("tr");
+        //The 2nd and 3rd only have relevant information
+
+        /* Structure explaned
+         * tr   useless shit ...
+         * tr   td Anime    td Anime 
+         * tr   td EpisodeI  td EpisodeI
+         * tr   useless shit ...
+         */
         for (int i = 1; i <= 3; i++) {
             Element row;
             try {
@@ -42,10 +50,8 @@ public class AnimeInfoExtractor {
                             title += aElement.text() + " ";
                         }
 
-                        // System.out.println("Title: " + title);
                         anime.setTitle(title);
                         animeList.add(anime);
-                        System.out.println("added anime");
                         continue;
                     }
 
@@ -67,13 +73,12 @@ public class AnimeInfoExtractor {
                         if(correctionDate != null) animeObject.setCorretionDate(correctionDate);
 
                     } else {
-                        System.out.println("No p elements found in this td.");
+                        // System.out.println("No p elements found in this td.");
                     }
                 }
             } else {
-                System.out.println("No td elements found in this tr.");
+                // System.out.println("No td elements found in this tr.");
             }
-            // System.out.println();
         }
         return animeList;
     }
