@@ -1,5 +1,7 @@
 package de.milschschnitte.crunchytransmitter;
 
+import javax.naming.ConfigurationException;
+
 import de.milschschnitte.crunchytransmitter.reciever.JsonEpisodeFetcher;
 
 /**
@@ -8,8 +10,10 @@ import de.milschschnitte.crunchytransmitter.reciever.JsonEpisodeFetcher;
  */
 public class App 
 {
-    public static void main( String[] args )
+    public static void main( String[] args ) throws ConfigurationException
     {
+        ConfigLoader cl = new ConfigLoader();
+
         JsonEpisodeFetcher jep = new JsonEpisodeFetcher();
         jep.fetch();
     }
