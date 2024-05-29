@@ -1,0 +1,3 @@
+create database crunchytransmitter;
+create user crunchytransmitter with encrypted password 'password';
+grant all privileges on database crunchytransmitter to crunchytransmitter;

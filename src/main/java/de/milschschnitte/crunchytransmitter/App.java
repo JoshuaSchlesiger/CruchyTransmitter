@@ -1,7 +1,12 @@
 package de.milschschnitte.crunchytransmitter;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.naming.ConfigurationException;
 
+import de.milschschnitte.crunchytransmitter.database.DatabaseManager;
 import de.milschschnitte.crunchytransmitter.reciever.JsonEpisodeFetcher;
 
 /**
@@ -13,6 +18,14 @@ public class App
     public static void main( String[] args ) throws ConfigurationException
     {
         ConfigLoader cl = new ConfigLoader();
+        try {
+            Connection db = DatabaseManager.getConnection(cl);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         JsonEpisodeFetcher jep = new JsonEpisodeFetcher();
         jep.fetch();
