@@ -20,16 +20,4 @@ public class Anime {
     public String getTitle(){
         return this.title;
     }
-
-    @Override
-    public String toString() {
-        return "Anime{" +
-                "Title='" + this.title + '\'' +
-                ", Episode='" + episode.getEpisode() + '\'' +
-                ", ReleaseTime='" + episode.getReleaseTime() + '\'' +
-                ", Weekday='" + episode.getWeekday() + '\'' +
-                ", TimestampOfWeekday='" + episode.getTimestampOfWeekday() + '\'' +
-                ", CorretionDate='" + episode.getCorrectionDate() + '\'' +
-                '}';
-    }
 }

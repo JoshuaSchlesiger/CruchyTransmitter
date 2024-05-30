@@ -67,9 +67,12 @@ public class JsonEpisodeFetcher {
                                     for (JsonNode animeEpisode : animeEpisodeNode) {
                                         String animeHTML = animeEpisode.get("table").get("content").toString();
 
-                                        List<Anime> animeList = AnimeInfoExtractor.extractAnime(animeHTML, weekday.getGermanName());
+                                        List<Anime> animeList = AnimeInfoExtractor.extractAnime(animeHTML, weekday);
                                         for (Anime anime : animeList) {
-                                            System.out.println(anime.toString());
+
+
+                                            System.out.print(anime.getTitle() + ":");
+                                            System.out.println((anime.getEpisode()).toString());
                                         }
                                         // System.out.println(animeHTML);
                                     }

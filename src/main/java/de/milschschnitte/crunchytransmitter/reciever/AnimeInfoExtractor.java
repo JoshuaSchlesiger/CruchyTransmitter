@@ -1,5 +1,6 @@
 package de.milschschnitte.crunchytransmitter.reciever;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +10,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class AnimeInfoExtractor {
-    public static List<Anime> extractAnime(String html, String weekday) {
+    public static List<Anime> extractAnime(String html, EnumWeekdays weekday) {
         // Parse the HTML content
         Document doc = Jsoup.parse(html);
 
         List<Anime> animeList = new ArrayList<>();
 
-        // Extracting data
+        // Extracting datanull;
         Elements rows = doc.select("tr");
         //The 2nd and 3rd only have relevant information
 
@@ -41,7 +42,7 @@ public class AnimeInfoExtractor {
 
                     Anime anime = new Anime();
                     Episode episode = anime.getEpisode();
-                    episode.setWeekday(weekday);
+                    episode.setDateOfWeekday(weekday);
 
                     Elements aElements = col.select("a");
 
@@ -71,8 +72,8 @@ public class AnimeInfoExtractor {
                         Anime animeBuffer = animeList.get(animeList.size() - (cols.size() - j));
                         Episode episodeBuffer = animeBuffer.getEpisode();
                         if(episodeBuffer.getEpisode() == "") episodeBuffer.setEpisodes(episodeString);
-                        if(episodeBuffer.getReleaseTime() == "") episodeBuffer.setReleaseTime(time);
-                        if(correctionDate != null) episodeBuffer.setCorretionDate(correctionDate);
+                        if(episodeBuffer.getReleaseTime() == null) episodeBuffer.setReleaseTime(time);
+                        if(correctionDate != null) episodeBuffer.setDateOfCorretionDate(correctionDate);
 
                     } else {
                         // System.out.println("No p elements found in this td.");

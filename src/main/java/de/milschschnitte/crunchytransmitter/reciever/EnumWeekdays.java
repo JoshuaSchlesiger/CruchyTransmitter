@@ -1,5 +1,7 @@
 package de.milschschnitte.crunchytransmitter.reciever;
 
+import java.time.DayOfWeek;
+
 public enum EnumWeekdays {
     MONDAY("Montag"),
     TUESDAY("Dienstag"),
@@ -31,5 +33,26 @@ public enum EnumWeekdays {
             }
         }
         return null;
+    }
+
+    public static DayOfWeek getDayOfWeek(EnumWeekdays enumWeekday) {
+        switch (enumWeekday) {
+            case MONDAY:
+                return DayOfWeek.MONDAY;
+            case TUESDAY:
+                return DayOfWeek.TUESDAY;
+            case WEDNESDAY:
+                return DayOfWeek.WEDNESDAY;
+            case THURSDAY:
+                return DayOfWeek.THURSDAY;
+            case FRIDAY:
+                return DayOfWeek.FRIDAY;
+            case SATURDAY:
+                return DayOfWeek.SATURDAY;
+            case SUNDAY:
+                return DayOfWeek.SUNDAY;
+            default:
+                throw new IllegalArgumentException("Unbekannter Wochentag: " + enumWeekday);
+        }
     }
 }
