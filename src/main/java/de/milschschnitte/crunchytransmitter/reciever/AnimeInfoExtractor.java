@@ -40,7 +40,8 @@ public class AnimeInfoExtractor {
                     Element col = cols.get(j);
 
                     Anime anime = new Anime();
-                    anime.setWeekday(weekday);
+                    Episode episode = anime.getEpisode();
+                    episode.setWeekday(weekday);
 
                     Elements aElements = col.select("a");
 
@@ -65,12 +66,13 @@ public class AnimeInfoExtractor {
 
                         int length = episodeRaw.length();
                         if(length < 4) continue;
-                        String episode = episodeRaw.substring(5, length - 3);
+                        String episodeString = episodeRaw.substring(5, length - 3);
 
-                        Anime animeObject = animeList.get(animeList.size() - (cols.size() - j));
-                        if(animeObject.getEpisode() == "") animeObject.setEpisodes(episode);
-                        if(animeObject.getReleaseTime() == "") animeObject.setReleaseTime(time);
-                        if(correctionDate != null) animeObject.setCorretionDate(correctionDate);
+                        Anime animeBuffer = animeList.get(animeList.size() - (cols.size() - j));
+                        Episode episodeBuffer = animeBuffer.getEpisode();
+                        if(episodeBuffer.getEpisode() == "") episodeBuffer.setEpisodes(episodeString);
+                        if(episodeBuffer.getReleaseTime() == "") episodeBuffer.setReleaseTime(time);
+                        if(correctionDate != null) episodeBuffer.setCorretionDate(correctionDate);
 
                     } else {
                         // System.out.println("No p elements found in this td.");

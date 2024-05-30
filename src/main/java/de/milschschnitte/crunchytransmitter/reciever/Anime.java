@@ -1,59 +1,35 @@
 package de.milschschnitte.crunchytransmitter.reciever;
 
 public class Anime {
-    private String Title;
-    private String Episode;
-    private String ReleaseTime;
-    private String Weekday;
-    private String TimestampOfWeekday;
-    private String CorretionDate;
+    private String title;
+    private Episode episode;
 
     public Anime(){
-        this.Title = "";
-        this.Episode = "";
-        this.ReleaseTime = "";
-        this.Weekday = "";
-        this.TimestampOfWeekday = "";
-        this.CorretionDate = "";
+        this.title = "";
+        this.episode = new Episode();
     }
 
-    public void setTitle(String Title){
-        this.Title = Title;
+    public Episode getEpisode(){
+        return this.episode;
     }
 
-    public void setEpisodes(String Episode){
-        this.Episode = Episode;
+    public void setTitle(String title){
+        this.title = title;
     }
 
-    public void setReleaseTime(String ReleaseTime){
-        this.ReleaseTime = ReleaseTime;
-    }
-
-    public void setWeekday(String Weekday){
-        this.Weekday = Weekday;
-    }
-
-    public void setCorretionDate(String CorretionDate){
-        this.CorretionDate = CorretionDate;
-    }
-
-    public String getEpisode(){
-        return this.Episode;
-    }
-
-    public String getReleaseTime(){
-        return this.ReleaseTime;
+    public String getTitle(){
+        return this.title;
     }
 
     @Override
     public String toString() {
         return "Anime{" +
-                "Title='" + Title + '\'' +
-                ", Episode='" + Episode + '\'' +
-                ", ReleaseTime='" + ReleaseTime + '\'' +
-                ", Weekday='" + Weekday + '\'' +
-                ", TimestampOfWeekday='" + TimestampOfWeekday + '\'' +
-                ", CorretionDate='" + CorretionDate + '\'' +
+                "Title='" + this.title + '\'' +
+                ", Episode='" + episode.getEpisode() + '\'' +
+                ", ReleaseTime='" + episode.getReleaseTime() + '\'' +
+                ", Weekday='" + episode.getWeekday() + '\'' +
+                ", TimestampOfWeekday='" + episode.getTimestampOfWeekday() + '\'' +
+                ", CorretionDate='" + episode.getCorrectionDate() + '\'' +
                 '}';
     }
 }
