@@ -1,5 +1,7 @@
 package de.milschschnitte.crunchytransmitter;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.naming.ConfigurationException;
@@ -14,18 +16,24 @@ import de.milschschnitte.crunchytransmitter.reciever.JsonEpisodeFetcher;
  */
 public class App 
 {
-    public static void main( String[] args ) throws ConfigurationException
+    public static void main( String[] args ) throws ConfigurationException, SQLException, IOException 
     {
         ConfigLoader cl = new ConfigLoader();
 
         JsonEpisodeFetcher jep = new JsonEpisodeFetcher();
         List<Anime> animeList = jep.fetch();
-        
+
+       
         for (Anime anime : animeList) {
             System.out.print(anime.getTitle() + ": ");
             System.out.println(anime.getImageUrl() + ": ");
             System.out.println((anime.getEpisode()).toString());
+
+            DatabaseManager.insertAnime(cl, anime);
         }
+
+        
+        
     }
 
 

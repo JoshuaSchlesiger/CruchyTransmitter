@@ -14,7 +14,8 @@ import java.sql.Connection;
 
 public class DatabaseManager {
     private static Connection getConnection(ConfigLoader cl) throws SQLException, IOException {
-        return DriverManager.getConnection(cl.getDatabaseUrl(), cl.getDatabaseUsername(), cl.getDatabasePassword());
+    Connection connection = DriverManager.getConnection(cl.getDatabaseUrl(), cl.getDatabaseUsername(), cl.getDatabasePassword());    
+    return connection;
     }
 
     /**
@@ -26,10 +27,11 @@ public class DatabaseManager {
      * @throws IOException
      */
     public static int insertAnime(ConfigLoader cl, Anime anime) throws SQLException, IOException {
-        String query = "INSERT INTO animes (title) VALUES (?) RETURNING id";
+        String query = "INSERT INTO anime (title, imageurl) VALUES (?, ?) RETURNING id";
         try (Connection connection = getConnection(cl);
                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, anime.getTitle());
+            preparedStatement.setString(2, anime.getImageUrl());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt(1);

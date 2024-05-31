@@ -57,9 +57,7 @@ public class JsonEpisodeFetcher {
                                     weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
                                     if (weekday == null) continue;
                                     if (weekday == EnumWeekdays.MONDAY) mondayFound = true;
-                                    
-                                    System.out.println(" ");
-                                    System.out.println(weekday.getGermanName()); 
+
                                     continue;
                                 } catch (NullPointerException e) {
                                     // System.out.println("skip weekday");
