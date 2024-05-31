@@ -3,21 +3,32 @@ package de.milschschnitte.crunchytransmitter.reciever;
 public class Anime {
     private String title;
     private Episode episode;
+    private String imageUrl;
 
-    public Anime(){
+    public Anime() {
         this.title = "";
         this.episode = new Episode();
+        this.imageUrl = "";
     }
 
-    public Episode getEpisode(){
+    public Episode getEpisode() {
         return this.episode;
     }
 
-    public void setTitle(String title){
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public String getTitle(){
-        return this.title;
+    public void setImageUrl(String imageUrl) {
+        String withoutBackslashes = imageUrl.replace("\\", "");
+        this.imageUrl = withoutBackslashes.replace("\"", "");
     }
 }

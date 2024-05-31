@@ -11,10 +11,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JsonEpisodeFetcher {
-    public void fetch() {
+
+    public List<Anime> fetch() {
+        List<Anime> animeList = new ArrayList<Anime>();
+        
         String url = "https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de-DE/stories?slug=seasonal-lineup%2F2024%2F4%2F1%2Fcrunchyroll-wochenprogramm-fruehling-2024";
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -66,15 +70,7 @@ public class JsonEpisodeFetcher {
                                     JsonNode animeEpisodeNode = elementNode.get("items");
                                     for (JsonNode animeEpisode : animeEpisodeNode) {
                                         String animeHTML = animeEpisode.get("table").get("content").toString();
-
-                                        List<Anime> animeList = AnimeInfoExtractor.extractAnime(animeHTML, weekday);
-                                        for (Anime anime : animeList) {
-
-
-                                            System.out.print(anime.getTitle() + ":");
-                                            System.out.println((anime.getEpisode()).toString());
-                                        }
-                                        // System.out.println(animeHTML);
+                                        animeList.addAll(AnimeInfoExtractor.extractAnime(animeHTML, weekday));
                                     }
                                     continue;
                                 } catch (NullPointerException e) {
@@ -101,5 +97,6 @@ public class JsonEpisodeFetcher {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return animeList;
     }
 }

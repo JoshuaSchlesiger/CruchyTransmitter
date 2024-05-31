@@ -18,15 +18,16 @@ public class AnimeInfoExtractor {
 
         // Extracting datanull;
         Elements rows = doc.select("tr");
-        //The 2nd and 3rd only have relevant information
+        List<String> imageUrlList = new ArrayList<String>();
 
+        //The 1st and 2nd and 3rd only have relevant information
         /* Structure explaned
-         * tr   useless shit ...
+         * tr   images
          * tr   td Anime    td Anime 
          * tr   td EpisodeI  td EpisodeI
          * tr   useless shit ...
          */
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 0; i <= 3; i++) {
             Element row;
             try {
                 row = rows.get(i);
@@ -38,9 +39,19 @@ public class AnimeInfoExtractor {
 
             if (cols.size() > 0) {
                 for( int j = 0; j < cols.size(); j++ ) {
+
                     Element col = cols.get(j);
 
                     Anime anime = new Anime();
+
+                    if(i == 0){
+                        String imageUrl = col.select("img").attr("src");
+                        imageUrlList.add(imageUrl);
+                        //ImageUrl muss noch in die anime rein
+                        continue;
+                    }
+
+
                     Episode episode = anime.getEpisode();
                     episode.setDateOfWeekday(weekday);
 
@@ -53,6 +64,13 @@ public class AnimeInfoExtractor {
                         }
 
                         anime.setTitle(title);
+
+                        if(j == 0) {
+                            anime.setImageUrl(imageUrlList.get(j));
+                        }else if (j == 1) {
+                            anime.setImageUrl(imageUrlList.get(j));
+                        }
+
                         animeList.add(anime);
                         continue;
                     }
