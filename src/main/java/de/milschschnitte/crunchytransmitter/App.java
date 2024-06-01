@@ -22,18 +22,17 @@ public class App
 
         JsonEpisodeFetcher jep = new JsonEpisodeFetcher();
         List<Anime> animeList = jep.fetch();
-
+        System.out.println("fetch done");
        
         for (Anime anime : animeList) {
-            System.out.print(anime.getTitle() + ": ");
-            System.out.println(anime.getImageUrl() + ": ");
-            System.out.println((anime.getEpisode()).toString());
+            // System.out.print(anime.getTitle() + ": ");
+            // System.out.println(anime.getImageUrl() + ": ");
+            // System.out.println((anime.getEpisode()).toString());
 
-            DatabaseManager.insertAnime(cl, anime);
+            int animeId = DatabaseManager.insertOrUpdateAnime(cl, anime);
+            DatabaseManager.insertOrUpdateEpisode(cl, animeId, anime.getEpisode());
         }
 
-        
-        
     }
 
 
