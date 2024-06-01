@@ -39,4 +39,8 @@ public class ConfigLoader {
     public String getDatabasePassword() {
         return properties.getProperty("database.password");
     }
+
+    public String getCrunchyrollSeasonURL(){
+        return properties.getProperty("crunchyroll.seasonURL");
+    }
 }

@@ -16,13 +16,11 @@ import java.util.List;
 
 public class JsonEpisodeFetcher {
 
-    public List<Anime> fetch() {
+    public List<Anime> fetch(String seasonURL) {
         List<Anime> animeList = new ArrayList<Anime>();
-        
-        String url = "https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de-DE/stories?slug=seasonal-lineup%2F2024%2F4%2F1%2Fcrunchyroll-wochenprogramm-fruehling-2024";
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet request = new HttpGet(url);
+            HttpGet request = new HttpGet(seasonURL);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode == 200) {
