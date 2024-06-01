@@ -18,7 +18,6 @@ public class JsonEpisodeFetcher {
 
     public List<Anime> fetch(String seasonURL) {
         List<Anime> animeList = new ArrayList<Anime>();
-
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(seasonURL);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
