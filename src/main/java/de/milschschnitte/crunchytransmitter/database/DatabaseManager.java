@@ -15,8 +15,8 @@ import java.sql.Connection;
 import java.sql.Date;
 
 public class DatabaseManager {
-    private static Connection getConnection(ConfigLoader cl) throws SQLException, IOException {
-    Connection connection = DriverManager.getConnection(cl.getDatabaseUrl(), cl.getDatabaseUsername(), cl.getDatabasePassword());    
+    private static Connection getConnection() throws SQLException, IOException {
+    Connection connection = DriverManager.getConnection(ConfigLoader.getProperty("spring.datasource.url"), ConfigLoader.getProperty("spring.datasource.username"), ConfigLoader.getProperty("spring.datasource.password"));    
     return connection;
     }
 
@@ -28,12 +28,12 @@ public class DatabaseManager {
      * @throws SQLException
      * @throws IOException
      */
-    public static int insertOrUpdateAnime(ConfigLoader cl, Anime anime) throws SQLException, IOException {
+    public static int insertOrUpdateAnime(Anime anime) throws SQLException, IOException {
         String selectQuery = "SELECT id, imageurl FROM anime WHERE title = ?";
         String updateQuery = "UPDATE anime SET imageurl = ? WHERE id = ?";
         String insertQuery = "INSERT INTO anime (title, imageurl) VALUES (?, ?) RETURNING id";
         
-        try (Connection connection = getConnection(cl)) {
+        try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
                 selectStatement.setString(1, anime.getTitle());
                 ResultSet resultSet = selectStatement.executeQuery();
@@ -68,12 +68,12 @@ public class DatabaseManager {
         }
     }
 
-    public static int insertOrUpdateEpisode(ConfigLoader cl, int animeId, Episode episode) throws SQLException, IOException {
+    public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException, IOException {
         String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ?";
         String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ?, correctionFlag = ? WHERE id = ?";
         String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, correctionFlag) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
         
-        try (Connection connection = getConnection(cl)) {
+        try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
                 selectStatement.setInt(1, animeId);
                 selectStatement.setString(2, episode.getEpisode());

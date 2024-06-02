@@ -2,8 +2,7 @@ create database crunchytransmitter;
 create user crunchytransmitter with encrypted password 'password';
 grant all privileges on database crunchytransmitter to crunchytransmitter;
 \c crunchytransmitter;
-GRANT SELECT, UPDATE, INSERT, DELETE ON anime,episodes TO crunchytransmitter;
-GRANT USAGE, SELECT ON SEQUENCE anime_id_seq, episodes_id_seq TO crunchytransmitter;
+
 
 CREATE TABLE anime (
     id SERIAL PRIMARY KEY,
@@ -21,3 +20,6 @@ CREATE TABLE episodes (
     correctionFlag BOOLEAN NOT NULL,
     FOREIGN KEY (anime_id) REFERENCES Anime(id)
 );
+
+GRANT SELECT, UPDATE, INSERT, DELETE ON anime,episodes TO crunchytransmitter;
+GRANT USAGE, SELECT ON SEQUENCE anime_id_seq, episodes_id_seq TO crunchytransmitter;

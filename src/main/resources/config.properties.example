@@ -1,5 +1,0 @@
-database.url = jdbc:postgresql://localhost:5432/crunchytransmitter
-database.username = crunchytransmitter
-database.password = password
-
-crunchyroll.seasonURL = https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de-DE/stories?slug=seasonal-lineup%2F2024%2F4%2F1%2Fcrunchyroll-wochenprogramm-fruehling-2024

@@ -27,6 +27,7 @@ public class BaseDataController {
 
     @GetMapping("/anime")
     public ResponseEntity<String> getAnimes(HttpServletRequest request) {
+        System.out.println("dfgfdgdfgdetewtrfw");
         String ipAddress = request.getRemoteAddr();
         Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
             Bandwidth limit = Bandwidth.classic(5, Refill.greedy(1, Duration.ofMinutes(1)));
