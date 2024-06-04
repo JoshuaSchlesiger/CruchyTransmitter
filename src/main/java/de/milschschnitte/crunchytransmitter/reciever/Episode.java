@@ -10,18 +10,28 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 
 public class Episode {
-
+    private Integer episodeID;
     private String episode;
     private Timestamp releaseTime;
     private Date dateOfWeekday;
     private Date dateOfCorretionDate;
 
     public Episode(){
+        this.episodeID = null;
         this.episode = "";
         this.releaseTime = null;
         this.dateOfWeekday = null;
         this.dateOfCorretionDate = null;
     }
+
+    public Episode(Integer episodeID, String episode, Timestamp releaseTime, Date dateOfWeekday, Date dateOfCorretionDate){
+        this.episodeID = episodeID;
+        this.episode = episode;
+        this.releaseTime = releaseTime;
+        this.dateOfWeekday = dateOfWeekday;
+        this.dateOfCorretionDate = dateOfCorretionDate;
+    }
+
     public void setEpisodes(String episode){
         this.episode = episode;
     }
@@ -58,6 +68,10 @@ public class Episode {
         int year = LocalDate.now().getYear();
         
         this.dateOfCorretionDate = Date.valueOf(LocalDate.of(year, month, day));
+    }
+
+    public Integer getEpisodeID(){
+        return this.episodeID;
     }
 
     public String getEpisode() {

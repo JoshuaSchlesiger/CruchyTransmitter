@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.milschschnitte.crunchytransmitter.ConfigLoader;
 import de.milschschnitte.crunchytransmitter.reciever.Anime;
@@ -70,8 +72,8 @@ public class DatabaseManager {
 
     public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException, IOException {
         String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ?";
-        String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ?, correctionFlag = ? WHERE id = ?";
-        String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser, correctionFlag) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
+        String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ? WHERE id = ?";
+        String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
         
         try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
@@ -106,7 +108,6 @@ public class DatabaseManager {
                             updateStatement.setTimestamp(1, episode.getReleaseTime());
                             updateStatement.setDate(2, episode.getDateOfWeekday());
                             updateStatement.setDate(3, episode.getDateOfCorrectionDate());
-                            updateStatement.setBoolean(4, true);
                             updateStatement.setInt(5, id);
                             updateStatement.executeUpdate();
                         }
@@ -123,15 +124,53 @@ public class DatabaseManager {
                 insertStatement.setDate(4, episode.getDateOfWeekday());
                 insertStatement.setDate(5, episode.getDateOfCorrectionDate());
                 insertStatement.setBoolean(6, false);
-                insertStatement.setBoolean(7, false);
                 ResultSet resultSet = insertStatement.executeQuery();
                 
                 if (resultSet.next()) {
-                    return resultSet.getInt(1); // Rückgabe der neuen ID
+                    return resultSet.getInt(1);
                 } else {
                     throw new SQLException("Inserting episode failed, no ID obtained.");
                 }
             }
         }
+    }
+
+    public static List<Anime> getNotifiableAnime() throws IOException{
+        String selectQueryEpisode = "SELECT id, anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE sendedpushtouser = false AND releaseTime <= now() AND dateofcorrectiondate IS NULL";
+        List<Anime> notifiableAnimes = new ArrayList<>();
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectQueryEpisode);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int animeId = resultSet.getInt("anime_id");
+                String episodeString = resultSet.getString("episode");
+                Timestamp releaseTime = resultSet.getTimestamp("releaseTime");
+                Date dateOfWeekday = resultSet.getDate("dateOfWeekday");
+                Date dateOfCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
+
+                Episode episode = new Episode(id, episodeString, releaseTime, dateOfWeekday, dateOfCorrectionDate);
+
+                String selectQueryAnime = "SELECT title, imageurl FROM anime WHERE id = ?";
+                PreparedStatement animeStatement = connection.prepareStatement(selectQueryAnime);
+                animeStatement.setInt(1, animeId);
+                try (ResultSet animeResultSet = animeStatement.executeQuery()) {
+                    if (animeResultSet.next()) {
+                        String title = animeResultSet.getString("title");
+                        String imageUrl = animeResultSet.getString("imageurl");
+                        
+                        Anime anime = new Anime(episode, animeId, title, imageUrl);
+                        notifiableAnimes.add(anime);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return notifiableAnimes;
+
     }
 }

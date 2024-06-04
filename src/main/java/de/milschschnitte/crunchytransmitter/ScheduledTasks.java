@@ -32,8 +32,12 @@ public class ScheduledTasks {
     }
 
     @Scheduled(fixedRate = 60000) // 60000 Millisekunden = 1 Minuten
-    private static void checkForPossibleNotification() {
+    private static void checkForPossibleNotification() throws IOException {
         logger.info("Start checkForPossibleNotification");
+        List<Anime> anime = DatabaseManager.getNotifiableAnime();
+        for (Anime anime2 : anime) {
+            System.out.println(anime2.getEpisode().toString());
+        }
     }
 
     @Scheduled(fixedRate = 300000) // 300000 Millisekunden = 5 Minuten

@@ -1,6 +1,7 @@
 package de.milschschnitte.crunchytransmitter.reciever;
 
 public class Anime {
+    private Integer animeId;
     private String title;
     private Episode episode;
     private String imageUrl;
@@ -9,6 +10,17 @@ public class Anime {
         this.title = "";
         this.episode = new Episode();
         this.imageUrl = "";
+    }
+
+    public Anime(Episode episode, Integer animeId ,String title, String imageUrl){
+        this.episode = episode;
+        this.animeId = animeId;
+        this.title = title;
+        this.imageUrl = imageUrl;
+    }
+
+    public int getAnimeId(){
+        return this.animeId;
     }
 
     public Episode getEpisode() {
