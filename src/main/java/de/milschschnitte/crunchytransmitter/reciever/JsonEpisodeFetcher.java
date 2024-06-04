@@ -39,14 +39,12 @@ public class JsonEpisodeFetcher {
                         JsonNode bodyNode = rootNode.get("story").get("content").get("body");
 
                         if (bodyNode.isArray()) {
-                            FileWriter writer = new FileWriter("output.json");
                             EnumWeekdays weekday = null;
 
                             Boolean mondayFound = false;
 
                             for (int i = 1; i < bodyNode.size(); i++) {
                                 JsonNode elementNode = bodyNode.get(i);
-                                writer.write(elementNode.toPrettyString());
 
                                 //Check weekdays, continue until monday is not found
                                 try {
@@ -79,7 +77,6 @@ public class JsonEpisodeFetcher {
                                     // System.out.println("skip horizontal");
                                 }                          
                             }
-                            writer.close();
                         } else {
                             System.out.println("Body of Crunchyroll list is not an array");
                             throw new RuntimeException();
