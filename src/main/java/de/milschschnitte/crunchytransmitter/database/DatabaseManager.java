@@ -9,6 +9,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.milschschnitte.crunchytransmitter.ConfigLoader;
 import de.milschschnitte.crunchytransmitter.reciever.Anime;
 import de.milschschnitte.crunchytransmitter.reciever.Episode;
@@ -17,9 +20,11 @@ import java.sql.Connection;
 import java.sql.Date;
 
 public class DatabaseManager {
-    private static Connection getConnection() throws SQLException, IOException {
-    Connection connection = DriverManager.getConnection(ConfigLoader.getProperty("spring.datasource.url"), ConfigLoader.getProperty("spring.datasource.username"), ConfigLoader.getProperty("spring.datasource.password"));    
-    return connection;
+    static Logger logger = LogManager.getLogger(DatabaseManager.class);
+    
+    private static Connection getConnection() throws SQLException {
+        Connection connection = DriverManager.getConnection(ConfigLoader.getProperty("spring.datasource.url"), ConfigLoader.getProperty("spring.datasource.username"), ConfigLoader.getProperty("spring.datasource.password"));    
+        return connection;
     }
 
     /**
@@ -30,7 +35,7 @@ public class DatabaseManager {
      * @throws SQLException
      * @throws IOException
      */
-    public static int insertOrUpdateAnime(Anime anime) throws SQLException, IOException {
+    public static int insertOrUpdateAnime(Anime anime) throws SQLException {
         String selectQuery = "SELECT id, imageurl FROM anime WHERE title = ?";
         String updateQuery = "UPDATE anime SET imageurl = ? WHERE id = ?";
         String insertQuery = "INSERT INTO anime (title, imageurl) VALUES (?, ?) RETURNING id";
@@ -49,6 +54,8 @@ public class DatabaseManager {
                             updateStatement.setString(1, anime.getImageUrl());
                             updateStatement.setInt(2, id);
                             updateStatement.executeUpdate();
+
+                            //SEND UPDATE TO CLIENT WITH GOOGLE FCM ONLY ANIME INFORMATION
                         }
                     }
 
@@ -70,7 +77,7 @@ public class DatabaseManager {
         }
     }
 
-    public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException, IOException {
+    public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException{
         String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ?";
         String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ? WHERE id = ?";
         String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
@@ -110,6 +117,8 @@ public class DatabaseManager {
                             updateStatement.setDate(3, episode.getDateOfCorrectionDate());
                             updateStatement.setInt(5, id);
                             updateStatement.executeUpdate();
+
+                            //SEND UPDATE TO CLIENTS WITH GOOGLE FCM ONLY EPISODE INFORMATION
                         }
                     }
                     
@@ -135,7 +144,7 @@ public class DatabaseManager {
         }
     }
 
-    public static List<Anime> getNotifiableAnime() throws IOException{
+    public static List<Anime> getNotifiableAnime(){
         String selectQueryEpisode = "SELECT id, anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE sendedpushtouser = false AND releaseTime <= now() AND dateofcorrectiondate IS NULL";
         List<Anime> notifiableAnimes = new ArrayList<>();
 
@@ -171,6 +180,24 @@ public class DatabaseManager {
         }
 
         return notifiableAnimes;
+    }
 
+    public static void setEpisodedPushed(Integer episodeID) {
+        String updateQuery = "UPDATE episodes SET sendedpushtouser = true WHERE id = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+
+            updateStatement.setInt(1, episodeID);
+            int rowsUpdated = updateStatement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                logger.info("Marked episode als pushed (episodeID): " + episodeID);
+            }else{
+                logger.fatal("Cannot find episode with id: " + episodeID);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
