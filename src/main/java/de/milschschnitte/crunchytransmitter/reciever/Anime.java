@@ -12,7 +12,7 @@ public class Anime {
         this.imageUrl = "";
     }
 
-    public Anime(Episode episode, Integer animeId ,String title, String imageUrl){
+    public Anime(Episode episode, Integer animeId, String title, String imageUrl){
         this.episode = episode;
         this.animeId = animeId;
         this.title = title;

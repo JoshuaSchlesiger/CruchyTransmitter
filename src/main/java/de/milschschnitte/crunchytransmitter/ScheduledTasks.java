@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+
 import de.milschschnitte.crunchytransmitter.database.DatabaseManager;
 import de.milschschnitte.crunchytransmitter.reciever.Anime;
 import de.milschschnitte.crunchytransmitter.reciever.Episode;
@@ -17,7 +19,9 @@ import de.milschschnitte.crunchytransmitter.reciever.Episode;
 public class ScheduledTasks {
     static Logger logger = LogManager.getLogger(ScheduledTasks.class);
 
-    // @Scheduled(fixedRate = 300000) // 300000 Millisekunden = 5 Minuten
+    public static String json = "";
+
+    // @Scheduled(fixedRate = 300000) // 300000 Millisec = 5 minutes
     // private static void fetchAnimeAndEpisodes() throws SQLException, IOException {
     //     logger.info("Anime fetch begin");
     //     JsonEpisodeFetcher jep = new JsonEpisodeFetcher();
@@ -31,7 +35,7 @@ public class ScheduledTasks {
     //     logger.info("Anime databse input done");
     // }
 
-    @Scheduled(fixedRate = 60000) // 60000 Millisekunden = 1 Minuten
+    @Scheduled(fixedRate = 60000) // 60000 Millisec = 1 minutes
     private static void checkForPossibleNotification() {
         logger.info("Start checkForPossibleNotification");
         List<Anime> anime = DatabaseManager.getNotifiableAnime();
@@ -42,5 +46,14 @@ public class ScheduledTasks {
 
             DatabaseManager.setEpisodedPushed(episode.getEpisodeID());
         }
+    }
+
+    @Scheduled(fixedRate = 300000) // 300000 Millisec = 5 minutes
+    private static void getAnimeAndEpisodeInformation() throws SQLException {
+        logger.info("Start getAnimeAndEpisodeInformation");
+        List<Anime> anime = DatabaseManager.getEpisodesAndAnimeOfWeek();
+
+        Gson gson = new Gson();
+        json = gson.toJson(anime);
     }
 }

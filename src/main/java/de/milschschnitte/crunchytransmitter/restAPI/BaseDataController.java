@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.milschschnitte.crunchytransmitter.ScheduledTasks;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
@@ -36,7 +37,7 @@ public class BaseDataController {
         });
 
         if(bucket.tryConsume(1)){
-            return ResponseEntity.ok("lol");
+            return ResponseEntity.ok(ScheduledTasks.json);
         }
         logger.warn("Someone is greeeeeedy: " + ipAddress);
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests");
