@@ -4,12 +4,12 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 public class BaseDataController {
 
+    Logger logger = LogManager.getLogger(BaseDataController.class);
     private final Map<String, Bucket> buckets;
 
     public BaseDataController(){
@@ -27,7 +28,7 @@ public class BaseDataController {
 
     @GetMapping("/anime")
     public ResponseEntity<String> getAnimes(HttpServletRequest request) {
-        System.out.println("dfgfdgdfgdetewtrfw");
+        logger.info("Access to /anime Website");
         String ipAddress = request.getRemoteAddr();
         Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
             Bandwidth limit = Bandwidth.classic(5, Refill.greedy(1, Duration.ofMinutes(1)));
@@ -37,6 +38,7 @@ public class BaseDataController {
         if(bucket.tryConsume(1)){
             return ResponseEntity.ok("lol");
         }
+        logger.warn("Someone is greeeeeedy: " + ipAddress);
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests");
     }
 }

@@ -71,7 +71,7 @@ public class DatabaseManager {
     public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException, IOException {
         String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ?";
         String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ?, correctionFlag = ? WHERE id = ?";
-        String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, correctionFlag) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
+        String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser, correctionFlag) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
         
         try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
@@ -123,6 +123,7 @@ public class DatabaseManager {
                 insertStatement.setDate(4, episode.getDateOfWeekday());
                 insertStatement.setDate(5, episode.getDateOfCorrectionDate());
                 insertStatement.setBoolean(6, false);
+                insertStatement.setBoolean(7, false);
                 ResultSet resultSet = insertStatement.executeQuery();
                 
                 if (resultSet.next()) {

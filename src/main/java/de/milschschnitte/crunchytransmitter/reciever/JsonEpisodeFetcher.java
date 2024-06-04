@@ -5,16 +5,20 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JsonEpisodeFetcher {
+
+    Logger logger = LogManager.getLogger(JsonEpisodeFetcher.class);
 
     public List<Anime> fetch(String seasonURL) {
         List<Anime> animeList = new ArrayList<Anime>();
@@ -75,20 +79,24 @@ public class JsonEpisodeFetcher {
                                     continue;
                                 } catch (NullPointerException e) {
                                     // System.out.println("skip horizontal");
-                                }                          
+                                }  
                             }
                         } else {
-                            System.out.println("Body of Crunchyroll list is not an array");
-                            throw new RuntimeException();
+                            
                         }
                     }
                 } else {
-                    System.out.println("Error: " + statusCode);
+                    logger.warn("Error on Crunchyroll-Serveraccess: " + statusCode);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if(animeList.size() == 0){
+            logger.fatal("Did not find any animes after process");
+        }
+        
         return animeList;
     }
 }

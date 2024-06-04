@@ -76,8 +76,8 @@ public class AnimeInfoExtractor {
 
                     Elements pElements = col.select("p");
                     if (!pElements.isEmpty() && animeList.size() != 0) {
-                        String episodeRaw = pElements.size() > 0 ? pElements.get(0).text() : "No episode info";
-                        String time = pElements.size() > 1 ? pElements.get(1).text() : "No time info";
+                        String episodeRaw = pElements.size() > 0 ? pElements.get(0).text() : "Keine Episodeninfos";
+                        String time = pElements.size() > 1 ? pElements.get(1).text() : "Keine Zeitinfos";
 
                         String correctionDate = null;
                         if(time.endsWith("*")) correctionDate = pElements.get(2).text();

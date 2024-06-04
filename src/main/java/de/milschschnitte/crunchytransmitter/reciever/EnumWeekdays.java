@@ -2,6 +2,9 @@ package de.milschschnitte.crunchytransmitter.reciever;
 
 import java.time.DayOfWeek;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public enum EnumWeekdays {
     MONDAY("Montag"),
     TUESDAY("Dienstag"),
@@ -12,6 +15,7 @@ public enum EnumWeekdays {
     SUNDAY("Sonntag");
 
     private final String germanName;
+    static Logger logger = LogManager.getLogger(EnumWeekdays.class);
 
     EnumWeekdays(String germanName) {
         this.germanName = germanName;
@@ -52,7 +56,8 @@ public enum EnumWeekdays {
             case SUNDAY:
                 return DayOfWeek.SUNDAY;
             default:
-                throw new IllegalArgumentException("Unbekannter Wochentag: " + enumWeekday);
+                logger.warn("Unknown weekday: " + enumWeekday);
+                throw new RuntimeException();
         }
     }
 }
