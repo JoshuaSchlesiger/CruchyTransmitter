@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -247,20 +246,43 @@ public class DatabaseManager {
                     String selectQueryAnime = "SELECT id, title, imageurl FROM anime WHERE id = ?";
                     try (PreparedStatement selectStatementAnime = connection.prepareStatement(selectQueryAnime)) {
                         selectStatementAnime.setInt(1, animeId);
-                
+
                         ResultSet animeResultSet = selectStatementAnime.executeQuery();
                         if (animeResultSet.next()) {
                             String title = animeResultSet.getString("title");
                             String imageUrl = animeResultSet.getString("imageurl");
-                
+
                             Anime anime = new Anime(episode, animeId, title, imageUrl);
                             animeList.add(anime);
-                        }else{
+                        } else {
                             logger.fatal("Can not find anime with id: " + animeId);
                         }
                     }
                 }
                 return animeList;
+            }
+        }
+    }
+
+    public static void setToken(String token) {
+        String insertQuery = "INSERT INTO tokens (token) VALUES (?)";
+
+        try (Connection connection = getConnection();
+                PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+
+            insertStatement.setString(1, token);
+            int rowsInserted = insertStatement.executeUpdate();
+
+            if (rowsInserted > 0) {
+                logger.info("Token inserted successfully: " + token);
+            } else {
+                logger.error("Failed to insert token: " + token);
+            }
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("23505")) { 
+                logger.warn("Duplicate token: " + token);
+            } else {
+                logger.error("Error while inserting token", e);
             }
         }
     }

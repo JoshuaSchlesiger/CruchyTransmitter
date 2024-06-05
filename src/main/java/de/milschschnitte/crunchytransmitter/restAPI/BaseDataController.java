@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.milschschnitte.crunchytransmitter.ConfigLoader;
 import de.milschschnitte.crunchytransmitter.ScheduledTasks;
+import de.milschschnitte.crunchytransmitter.database.DatabaseManager;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
@@ -63,8 +64,7 @@ public class BaseDataController {
         });
 
         if(bucket.tryConsume(1)){
-            //Send data to db
-            logger.info("Registered new user with token: " + requestBody.getToken());
+            DatabaseManager.setToken(requestBody.getToken());
             return ResponseEntity.ok("successful");
         }
 

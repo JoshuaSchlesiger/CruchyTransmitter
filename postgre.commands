@@ -25,5 +25,9 @@ CREATE TABLE episodes (
     FOREIGN KEY (anime_id) REFERENCES anime(id)
 );
 
-GRANT SELECT, UPDATE, INSERT, DELETE ON anime,episodes TO crunchytransmitter;
+CREATE TABLE tokens (
+    token VARCHAR(255) PRIMARY KEY
+);
+
+GRANT SELECT, UPDATE, INSERT, DELETE ON anime,episodes,tokens TO crunchytransmitter;
 GRANT USAGE, SELECT ON SEQUENCE anime_id_seq, episodes_id_seq TO crunchytransmitter;
