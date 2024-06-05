@@ -28,4 +28,4 @@ replay_pid*
 *.properties
 /.vscode
 
-google-services.json
+*.json
