@@ -14,7 +14,7 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
-        FileInputStream serviceAccount = new FileInputStream("src/main/resources/google-services.json");
+        FileInputStream serviceAccount = new FileInputStream("src/main/resources/crunchy-transmitter-firebase-adminsdk-fondb-7cc6dde6c0.json");
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
