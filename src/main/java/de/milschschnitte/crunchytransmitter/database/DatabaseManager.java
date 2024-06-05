@@ -123,9 +123,9 @@ public class DatabaseManager {
                             updateStatement.setTimestamp(1, episode.getReleaseTime());
                             updateStatement.setDate(2, episode.getDateOfWeekday());
                             updateStatement.setDate(3, episode.getDateOfCorrectionDate());
-                            updateStatement.setInt(5, id);
+                            updateStatement.setInt(4, id);
                             updateStatement.executeUpdate();
-                            logger.info("Updatet episode: " + id + ", notification will be send");
+                            logger.info("Updated episode: " + id + ", correction notification will be send");
 
                             // SEND UPDATE TO CLIENTS WITH GOOGLE FCM ONLY EPISODE INFORMATION
                         }
