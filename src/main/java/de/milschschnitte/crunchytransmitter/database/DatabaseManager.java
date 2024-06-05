@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -286,4 +287,24 @@ public class DatabaseManager {
             }
         }
     }
+
+    public static List<String> getAllTokens(){
+        List<String> tokens = new ArrayList<>();
+        String selectQuery = "SELECT token FROM tokens";
+    
+        try (Connection connection = getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(selectQuery)) {
+    
+            while (resultSet.next()) {
+                tokens.add(resultSet.getString("token"));
+            }
+    
+        } catch (SQLException e) {
+            logger.error("Error while retrieving tokens", e);
+        }
+    
+        return tokens;
+    }
+
 }
