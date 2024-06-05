@@ -48,15 +48,15 @@ public class BaseDataController {
     }
 
     @PostMapping("/anime")
-    public ResponseEntity<String> postFCMToken(HttpServletRequest request, @RequestBody String requestBody) {
-        String password = request.getHeader("API-Password");
+    public ResponseEntity<String> postFCMToken(HttpServletRequest request, @RequestBody FCMTokenPostRequest requestBody) {
+        String password = requestBody.getPassword();
+        String ipAddress = request.getRemoteAddr();
 
         if (password == null || !password.equals(ConfigLoader.getProperty("spring.api.key"))) {
-            logger.info("Someone tried to register with wrong password: " + password);
+            logger.info("Someone tried to register with wrong password. IP-Address: " + ipAddress);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
-
-        String ipAddress = request.getRemoteAddr();
+        
         Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
             Bandwidth limit = Bandwidth.classic(5, Refill.greedy(1, Duration.ofMinutes(5)));
             return Bucket.builder().addLimit(limit).build();
@@ -64,7 +64,7 @@ public class BaseDataController {
 
         if(bucket.tryConsume(1)){
             //Send data to db
-            logger.info("Registered new user with token: " + requestBody);
+            logger.info("Registered new user with token: " + requestBody.getToken());
             return ResponseEntity.ok("successful");
         }
 
