@@ -15,7 +15,10 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+
 import de.milschschnitte.crunchytransmitter.ConfigLoader;
+import de.milschschnitte.crunchytransmitter.fcm.NotificationService;
 import de.milschschnitte.crunchytransmitter.reciever.Anime;
 import de.milschschnitte.crunchytransmitter.reciever.Episode;
 
@@ -127,7 +130,9 @@ public class DatabaseManager {
                             updateStatement.executeUpdate();
                             logger.info("Updated episode: " + id + ", correction notification will be send");
 
-                            // SEND UPDATE TO CLIENTS WITH GOOGLE FCM ONLY EPISODE INFORMATION
+                            Gson gson = new Gson();
+                            String episodeJson = gson.toJson(episode);
+                            NotificationService.sendNotificationInBlocks("update", episodeJson);
                         }
                     }
 
@@ -201,7 +206,7 @@ public class DatabaseManager {
             int rowsUpdated = updateStatement.executeUpdate();
 
             if (rowsUpdated > 0) {
-                logger.info("Marked episode als pushed (episodeID): " + episodeID);
+                logger.info("Marked episode as pushed (episodeID): " + episodeID);
             } else {
                 logger.fatal("Cannot find episode with id: " + episodeID);
             }
@@ -280,7 +285,7 @@ public class DatabaseManager {
                 logger.error("Failed to insert token: " + token);
             }
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23505")) { 
+            if (e.getSQLState().equals("23505")) {
                 logger.warn("Duplicate token: " + token);
             } else {
                 logger.error("Error while inserting token", e);
@@ -288,22 +293,22 @@ public class DatabaseManager {
         }
     }
 
-    public static List<String> getAllTokens(){
+    public static List<String> getAllTokens() {
         List<String> tokens = new ArrayList<>();
         String selectQuery = "SELECT token FROM tokens";
-    
+
         try (Connection connection = getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(selectQuery)) {
-    
+
             while (resultSet.next()) {
                 tokens.add(resultSet.getString("token"));
             }
-    
+
         } catch (SQLException e) {
             logger.error("Error while retrieving tokens", e);
         }
-    
+
         return tokens;
     }
 
