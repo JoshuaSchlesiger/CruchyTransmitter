@@ -37,22 +37,30 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String _storageKeyCounter = '';
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  void _incrementCounter() {
+  Future<void> _incrementCounter() async {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
+    });
+
+    (await _prefs).setInt(_storageKeyCounter, _counter);
+  }
+
+  @override
+  void initState() {
+    _storageKeyCounter = "counter";
+
+    super.initState();
+    _prefs.then((prefs) {
+      setState(() {
+        _counter = prefs.getInt(_storageKeyCounter) ?? 0;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    _storageKeyCounter = "counter";
-
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     return Scaffold(
@@ -68,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              _storageKeyCounter,
+              '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
