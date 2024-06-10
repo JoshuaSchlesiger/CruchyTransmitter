@@ -1,4 +1,5 @@
 import 'package:crunchy_transmitter/settings_page.dart';
+import 'package:crunchy_transmitter/weekday.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -169,22 +170,22 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          buildSection('Montag'),
+          buildSection(Weekday.monday),
           buildGrid(),
-          buildSection('Dienstag'),
+          buildSection(Weekday.thursday),
           buildGrid(),
         ],
       ),
     );
   }
 
-  Widget buildSection(String title) {
+  Widget buildSection(Weekday title) {
     return Padding(
       padding: const EdgeInsets.only(top: 15, bottom: 15),
       child: Align(
         alignment: Alignment.center,
         child: Text(
-          title,
+          title.toGerman(),
           style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
