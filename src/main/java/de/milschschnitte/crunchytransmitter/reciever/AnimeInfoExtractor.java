@@ -84,7 +84,7 @@ public class AnimeInfoExtractor {
 
                         int length = episodeRaw.length();
                         if(length < 4) continue;
-                        String episodeString = episodeRaw.substring(5, length - 3);
+                        String episodeString = episodeRaw.substring(3, length - 3);
 
                         Anime animeBuffer = animeList.get(animeList.size() - (cols.size() - j));
                         Episode episodeBuffer = animeBuffer.getEpisode();
@@ -93,7 +93,7 @@ public class AnimeInfoExtractor {
                         if(correctionDate != null) episodeBuffer.setDateOfCorretionDate(correctionDate);
 
                     } else {
-                        // System.out.println("No p elements found in this td.");
+                        // System.out.println("No p elements found in this td.");   
                     }
                 }
             } else {
