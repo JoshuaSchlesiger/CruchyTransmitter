@@ -176,6 +176,39 @@ class _MyHomePageState extends State<MyHomePage> {
           buildGrid(),
           buildSection(Weekday.thursday),
           buildGrid(),
+          FutureBuilder(
+            future: fetchData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text(
+                  'Error: ${snapshot.error}',
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 255, 255, 255)),
+                );
+              } else {
+                // Daten erfolgreich erhalten
+                // Gib das Future-Objekt und die JSON-Daten aus
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Future: ${snapshot.data}',
+                      style: const TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255)),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'JSON Data: ${jsonEncode(snapshot.data)}',
+                      style: const TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255)),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
         ],
       ),
     );
@@ -265,8 +298,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future fetchData() async {
-    final response =
-        await http.get(Uri.https('dein-server.com', '/dein-endpoint'));
+    final response = await http.get(Uri.parse(
+        'http://tomcat.localhost/CrunchyTransmitter-1.0-SNAPSHOT/anime'));
 
     if (response.statusCode == 200) {
       // Wenn die Anfrage erfolgreich war, gib die empfangenen Daten zurück
