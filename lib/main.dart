@@ -104,13 +104,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(
-            left: 20, top: 10), // Hier kannst du das Padding einstellen
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 20, top: 10),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
@@ -119,11 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: OutlinedButton(
                     onPressed: () {
                       setState(() {
-                        if (selectedIndex == 0) {
-                          selectedIndex = -1;
-                        } else {
-                          selectedIndex = 0;
-                        }
+                        selectedIndex = selectedIndex == 0 ? -1 : 0;
                       });
                     },
                     style: OutlinedButton.styleFrom(
@@ -151,11 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: OutlinedButton(
                     onPressed: () {
                       setState(() {
-                        if (selectedIndex == 1) {
-                          selectedIndex = -1;
-                        } else {
-                          selectedIndex = 1;
-                        }
+                        selectedIndex = selectedIndex == 1 ? -1 : 1;
                       });
                     },
                     style: OutlinedButton.styleFrom(
@@ -178,48 +168,94 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            const SizedBox(
-                height: 20), // Abstand zwischen den Buttons und den Bildern
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    setState(() {});
-                  },
-                  child: Column(
-                    children: <Widget>[
-                      Image.network(
-                        'https://via.placeholder.com/240x360',
-                        width: 160,
-                        height: 175,
-                      ),
-                      Text('Text 1'),
-                      Text('Text 2'),
-                      Text('Text 3'),
-                    ],
-                  ),
+          ),
+          buildSection('Montag'),
+          buildGrid(),
+          buildSection('Dienstag'),
+          buildGrid(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSection(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15, bottom: 15),
+      child: Align(
+        alignment: Alignment.center,
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 255, 255, 255),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildGrid() {
+    return GridView.count(
+      shrinkWrap: true,
+      childAspectRatio: 0.46,
+      primary: false,
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      crossAxisCount: 2,
+      children: List.generate(3, (index) => buildGridItem()),
+    );
+  }
+
+  Widget buildGridItem() {
+    return GestureDetector(
+      onTap: () {
+        // Hier passiert etwas, wenn der Container angeklickt wird
+      },
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Image.network(
+                'https://via.placeholder.com/240x360',
+                width: 120,
+                height: 180,
+              ),
+              Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 120,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {});
-                  },
-                  child: Column(
-                    children: <Widget>[
-                      Image.network(
-                        'https://via.placeholder.com/240x360',
-                        width: 160,
-                        height: 175,
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "I'll Use My Appraisal Skill to Rise in the World I'll Use My Appraisal Skill to Rise in the World ",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 244, 117, 33),
                       ),
-                      Text('Text 1'),
-                      Text('Text 2'),
-                      Text('Text 3'),
-                    ],
-                  ),
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'Folge 1109 ',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      '16:00 Uhr',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
