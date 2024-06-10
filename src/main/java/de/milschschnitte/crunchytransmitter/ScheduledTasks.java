@@ -23,19 +23,19 @@ public class ScheduledTasks {
 
     public static String json = "";
 
-    // @Scheduled(fixedRate = 300000) // 300000 Millisec = 5 minutes
-    // private static void fetchAnimeAndEpisodes() throws SQLException, IOException {
-    //     logger.info("Anime fetch begin");
-    //     JsonEpisodeFetcher jep = new JsonEpisodeFetcher();
-    //     List<Anime> animeList = jep.fetch(ConfigLoader.getProperty("crunchyroll.seasonURL"));
-    //     logger.info("Anime fetch done");
+    @Scheduled(fixedRate = 300000) // 300000 Millisec = 5 minutes
+    private static void fetchAnimeAndEpisodes() throws SQLException, IOException {
+        logger.info("Anime fetch begin");
+        JsonEpisodeFetcher jep = new JsonEpisodeFetcher();
+        List<Anime> animeList = jep.fetch(ConfigLoader.getProperty("crunchyroll.seasonURL"));
+        logger.info("Anime fetch done");
 
-    //     for (Anime anime : animeList) {
-    //         int animeId = DatabaseManager.insertOrUpdateAnime(anime);
-    //         DatabaseManager.insertOrUpdateEpisode(animeId, anime.getEpisode());
-    //     }
-    //     logger.info("Anime databse input done");
-    // }
+        for (Anime anime : animeList) {
+            int animeId = DatabaseManager.insertOrUpdateAnime(anime);
+            DatabaseManager.insertOrUpdateEpisode(animeId, anime.getEpisode());
+        }
+        logger.info("Anime databse input done");
+    }
 
     @Scheduled(fixedRate = 60000) // 60000 Millisec = 1 minutes
     private static void checkForPossibleNotification() {
