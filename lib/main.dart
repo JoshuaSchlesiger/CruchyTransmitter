@@ -2,6 +2,8 @@ import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -260,5 +262,18 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  Future fetchData() async {
+    final response =
+        await http.get(Uri.https('dein-server.com', '/dein-endpoint'));
+
+    if (response.statusCode == 200) {
+      // Wenn die Anfrage erfolgreich war, gib die empfangenen Daten zurück
+      return jsonDecode(response.body);
+    } else {
+      // Wenn die Anfrage fehlgeschlagen ist, wirf eine Ausnahme
+      throw Exception('Failed to load data');
+    }
   }
 }
