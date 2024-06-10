@@ -34,6 +34,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int selectedIndex = -1;
   int _counter = 0;
   String _storageKeyCounter = '';
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -103,24 +104,123 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.only(
+            left: 20, top: 10), // Hier kannst du das Padding einstellen
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 110,
+                  height: 30,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        if (selectedIndex == 0) {
+                          selectedIndex = -1;
+                        } else {
+                          selectedIndex = 0;
+                        }
+                      });
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: selectedIndex == 0
+                            ? Colors.green
+                            : const Color.fromRGBO(97, 97, 97, 1),
+                      ),
+                    ),
+                    child: Text(
+                      'Deaktivierte',
+                      style: TextStyle(
+                        color: selectedIndex == 0
+                            ? Colors.white
+                            : const Color.fromARGB(255, 168, 168, 168),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 110,
+                  height: 30,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        if (selectedIndex == 1) {
+                          selectedIndex = -1;
+                        } else {
+                          selectedIndex = 1;
+                        }
+                      });
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: selectedIndex == 1
+                            ? Colors.green
+                            : const Color.fromRGBO(97, 97, 97, 1),
+                      ),
+                    ),
+                    child: Text(
+                      'Aktivierte',
+                      style: TextStyle(
+                        color: selectedIndex == 1
+                            ? Colors.white
+                            : const Color.fromARGB(255, 168, 168, 168),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const SizedBox(
+                height: 20), // Abstand zwischen den Buttons und den Bildern
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    setState(() {});
+                  },
+                  child: Column(
+                    children: <Widget>[
+                      Image.network(
+                        'https://via.placeholder.com/240x360',
+                        width: 160,
+                        height: 175,
+                      ),
+                      Text('Text 1'),
+                      Text('Text 2'),
+                      Text('Text 3'),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {});
+                  },
+                  child: Column(
+                    children: <Widget>[
+                      Image.network(
+                        'https://via.placeholder.com/240x360',
+                        width: 160,
+                        height: 175,
+                      ),
+                      Text('Text 1'),
+                      Text('Text 2'),
+                      Text('Text 3'),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
