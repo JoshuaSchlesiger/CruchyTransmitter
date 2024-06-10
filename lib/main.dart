@@ -1,3 +1,4 @@
+import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,10 +14,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+          scaffoldBackgroundColor: const Color.fromARGB(255, 20, 20, 20)),
+      home: const MyHomePage(title: 'Crunchy Transmitter'),
     );
   }
 }
@@ -65,8 +64,44 @@ class _MyHomePageState extends State<MyHomePage> {
     // by the _incrementCounter method above.
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: const Color.fromARGB(255, 33, 33, 33),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.title,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 244, 117, 33),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 16.0), // Versetzt nach rechts
+              child: Text(
+                "%Frühlingsseason ${DateTime.now().year}",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.settings,
+              color: Color.fromARGB(155, 255, 255, 255),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
