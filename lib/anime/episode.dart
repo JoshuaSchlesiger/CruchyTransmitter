@@ -32,7 +32,6 @@ class Episode {
     return Episode(
       episodeID: json['episodeID'],
       episode: json['episode'],
-      // Use DateTime.parse for ISO 8601 format
       releaseTime: DateTime.parse(json['releaseTime']),
       dateOfWeekday: DateTime.parse(json['dateOfWeekday']),
       correctionDate: json.containsKey('correctionDate')

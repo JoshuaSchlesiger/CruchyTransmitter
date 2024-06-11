@@ -2,14 +2,12 @@ import 'dart:convert';
 
 import 'package:crunchy_transmitter/anime/anime.dart';
 import 'package:crunchy_transmitter/anime/anime_handler.dart';
-import 'package:crunchy_transmitter/anime/episode.dart';
 import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
-  // Hier kannst du die restliche App-Initialisierung durchführen
   runApp(const MyApp());
 }
 
@@ -64,11 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
       } else {
         _animeData = await fetchAndGroupAnimeByWeekday();
-        // Save the data in SharedPreferences
         await saveAnimeDataToSharedPreferences(_animeData!, prefs);
       }
 
-      // Then update the state
       setState(() {
         _isLoading = false;
       });
@@ -77,8 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 33, 33, 33),
@@ -249,9 +243,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final int? correctionDate = anime.episode.correctionDate?.day;
     return GestureDetector(
-      onTap: () {
-        // Hier passiert etwas, wenn der Container angeklickt wird
-      },
+      onTap: () {},
       child: Center(
         child: Container(
           padding: const EdgeInsets.all(0),
