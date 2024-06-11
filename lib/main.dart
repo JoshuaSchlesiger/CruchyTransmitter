@@ -225,10 +225,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget buildGrid(List<Anime> animeList) {
     return GridView.count(
       shrinkWrap: true,
-      childAspectRatio: 0.46,
+      childAspectRatio: 0.6,
       primary: false,
       padding: const EdgeInsets.only(left: 0, right: 0),
-      crossAxisSpacing: 10,
+      crossAxisSpacing: 0,
       mainAxisSpacing: 0,
       crossAxisCount: 2,
       children: List.generate(
@@ -242,66 +242,65 @@ class _MyHomePageState extends State<MyHomePage> {
         anime.episode.releaseTime.minute.toString().padLeft(2, '0');
 
     final int? correctionDate = anime.episode.correctionDate?.day;
+
     return GestureDetector(
-      onTap: () {},
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.all(0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Image.network(
-                anime.imageUrl,
-                width: 120,
-                height: 180,
-              ),
-              Container(
-                constraints: const BoxConstraints(
-                  maxWidth: 120,
+        onTap: () {},
+        child: Center(
+          child: SizedBox(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Image.network(
+                  anime.imageUrl,
+                  width: 120,
+                  height: 180,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      anime.title,
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 244, 117, 33),
-                      ),
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (anime.episode.correctionDate == null)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$releaseHour:$releaseMinute Uhr',
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            anime.episode.episode,
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      )
-                    else
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 120,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
                       Text(
-                        '$correctionDate',
+                        anime.title,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 244, 117, 33),
                         ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
+                      if (anime.episode.correctionDate == null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$releaseHour:$releaseMinute Uhr',
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              anime.episode.episode,
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Text(
+                          '$correctionDate',
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
