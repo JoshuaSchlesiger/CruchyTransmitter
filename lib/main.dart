@@ -1,11 +1,15 @@
+import 'dart:convert';
+
+import 'package:crunchy_transmitter/anime/anime.dart';
+import 'package:crunchy_transmitter/anime/anime_handler.dart';
+import 'package:crunchy_transmitter/anime/episode.dart';
 import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-void main() {
+Future<void> main() async {
+  // Hier kannst du die restliche App-Initialisierung durchführen
   runApp(const MyApp());
 }
 
@@ -38,26 +42,35 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int selectedIndex = -1;
-  int _counter = 0;
-  String _storageKeyCounter = '';
+  String _storageKeyAnimeData = '';
+  Map<Weekday, List<Anime>>? _animeData;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-  Future<void> _incrementCounter() async {
-    setState(() {
-      _counter++;
-    });
-
-    (await _prefs).setInt(_storageKeyCounter, _counter);
-  }
+  bool _isLoading = true;
 
   @override
   void initState() {
-    _storageKeyCounter = "counter";
-
     super.initState();
-    _prefs.then((prefs) {
+
+    _storageKeyAnimeData = "animeData";
+
+    _prefs.then((prefs) async {
+      final String? animeDataString = prefs.getString(_storageKeyAnimeData);
+
+      if (animeDataString != null) {
+        final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
+        _animeData = Map<Weekday, List<Anime>>.from(jsonMap.map(
+          (key, value) => MapEntry(WeekdayExtension.fromString(key),
+              (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
+        ));
+      } else {
+        _animeData = await fetchAndGroupAnimeByWeekday();
+        // Save the data in SharedPreferences
+        await saveAnimeDataToSharedPreferences(_animeData!, prefs);
+      }
+
+      // Then update the state
       setState(() {
-        _counter = prefs.getInt(_storageKeyCounter) ?? 0;
+        _isLoading = false;
       });
     });
   }
@@ -107,110 +120,94 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 20, top: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 110,
-                  height: 30,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        selectedIndex = selectedIndex == 0 ? -1 : 0;
-                      });
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: selectedIndex == 0
-                            ? Colors.green
-                            : const Color.fromRGBO(97, 97, 97, 1),
-                      ),
-                    ),
-                    child: Text(
-                      'Deaktivierte',
-                      style: TextStyle(
-                        color: selectedIndex == 0
-                            ? Colors.white
-                            : const Color.fromARGB(255, 168, 168, 168),
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 110,
-                  height: 30,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        selectedIndex = selectedIndex == 1 ? -1 : 1;
-                      });
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: selectedIndex == 1
-                            ? Colors.green
-                            : const Color.fromRGBO(97, 97, 97, 1),
-                      ),
-                    ),
-                    child: Text(
-                      'Aktivierte',
-                      style: TextStyle(
-                        color: selectedIndex == 1
-                            ? Colors.white
-                            : const Color.fromARGB(255, 168, 168, 168),
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          buildSection(Weekday.monday),
-          buildGrid(),
-          buildSection(Weekday.thursday),
-          buildGrid(),
-          FutureBuilder(
-            future: fetchData(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text(
-                  'Error: ${snapshot.error}',
-                  style: const TextStyle(
-                      color: Color.fromARGB(255, 255, 255, 255)),
-                );
-              } else {
-                // Daten erfolgreich erhalten
-                // Gib das Future-Objekt und die JSON-Daten aus
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : _animeData != null
+              ? ListView(
                   children: [
-                    Text(
-                      'Future: ${snapshot.data}',
-                      style: const TextStyle(
-                          color: Color.fromARGB(255, 255, 255, 255)),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, top: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 110,
+                            height: 30,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedIndex = selectedIndex == 0 ? -1 : 0;
+                                });
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: selectedIndex == 0
+                                      ? Colors.green
+                                      : const Color.fromRGBO(97, 97, 97, 1),
+                                ),
+                              ),
+                              child: Text(
+                                'Deaktivierte',
+                                style: TextStyle(
+                                  color: selectedIndex == 0
+                                      ? Colors.white
+                                      : const Color.fromARGB(
+                                          255, 168, 168, 168),
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          SizedBox(
+                            width: 110,
+                            height: 30,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedIndex = selectedIndex == 1 ? -1 : 1;
+                                });
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: selectedIndex == 1
+                                      ? Colors.green
+                                      : const Color.fromRGBO(97, 97, 97, 1),
+                                ),
+                              ),
+                              child: Text(
+                                'Aktivierte',
+                                style: TextStyle(
+                                  color: selectedIndex == 1
+                                      ? Colors.white
+                                      : const Color.fromARGB(
+                                          255, 168, 168, 168),
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
-                      'JSON Data: ${jsonEncode(snapshot.data)}',
-                      style: const TextStyle(
-                          color: Color.fromARGB(255, 255, 255, 255)),
-                    ),
+                    ..._animeData!.entries.map((entry) {
+                      return Column(
+                        children: [
+                          buildSection(entry.key),
+                          buildGrid(entry.value),
+                        ],
+                      );
+                    }),
                   ],
-                );
-              }
-            },
-          ),
-        ],
-      ),
+                )
+              : const Center(
+                  child: Text(
+                    'No data found',
+                    style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+                  ),
+                ),
     );
   }
 
@@ -231,32 +228,38 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget buildGrid() {
+  Widget buildGrid(List<Anime> animeList) {
     return GridView.count(
       shrinkWrap: true,
       childAspectRatio: 0.46,
       primary: false,
-      padding: const EdgeInsets.only(left: 20, right: 20),
+      padding: const EdgeInsets.only(left: 0, right: 0),
       crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
+      mainAxisSpacing: 0,
       crossAxisCount: 2,
-      children: List.generate(3, (index) => buildGridItem()),
+      children: List.generate(
+          animeList.length, (index) => buildGridItem(animeList[index])),
     );
   }
 
-  Widget buildGridItem() {
+  Widget buildGridItem(Anime anime) {
+    final int releaseHour = anime.episode.releaseTime.hour;
+    final String releaseMinute =
+        anime.episode.releaseTime.minute.toString().padLeft(2, '0');
+
+    final int? correctionDate = anime.episode.correctionDate?.day;
     return GestureDetector(
       onTap: () {
         // Hier passiert etwas, wenn der Container angeklickt wird
       },
       child: Center(
         child: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Image.network(
-                'https://via.placeholder.com/240x360',
+                anime.imageUrl,
                 width: 120,
                 height: 180,
               ),
@@ -264,29 +267,42 @@ class _MyHomePageState extends State<MyHomePage> {
                 constraints: const BoxConstraints(
                   maxWidth: 120,
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "I'll Use My Appraisal Skill to Rise in the World I'll Use My Appraisal Skill to Rise in the World ",
-                      style: TextStyle(
+                      anime.title,
+                      style: const TextStyle(
                         color: Color.fromARGB(255, 244, 117, 33),
                       ),
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      'Folge 1109 ',
-                      style: TextStyle(
-                        color: Colors.white,
+                    if (anime.episode.correctionDate == null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$releaseHour:$releaseMinute Uhr',
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            anime.episode.episode,
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Text(
+                        '$correctionDate',
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '16:00 Uhr',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -295,18 +311,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-
-  Future fetchData() async {
-    final response = await http.get(Uri.parse(
-        'http://tomcat.localhost/CrunchyTransmitter-1.0-SNAPSHOT/anime'));
-
-    if (response.statusCode == 200) {
-      // Wenn die Anfrage erfolgreich war, gib die empfangenen Daten zurück
-      return jsonDecode(response.body);
-    } else {
-      // Wenn die Anfrage fehlgeschlagen ist, wirf eine Ausnahme
-      throw Exception('Failed to load data');
-    }
   }
 }
