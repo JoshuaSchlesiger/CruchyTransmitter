@@ -71,11 +71,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _updateAnime(Anime anime) async {
     final SharedPreferences prefs = await _prefs;
-    print(anime);
     await updateSingleAnimeInSharedPreferences(anime, prefs);
 
     final String? animeDataString = prefs.getString(_storageKeyAnimeData);
-    print(animeDataString);
     if (animeDataString != null) {
       final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
       _animeData = Map<Weekday, List<Anime>>.from(jsonMap.map(
@@ -243,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget buildGrid(List<Anime> animeList) {
     return GridView.count(
       shrinkWrap: true,
-      childAspectRatio: 0.6,
+      childAspectRatio: 0.52,
       primary: false,
       padding: const EdgeInsets.only(left: 0, right: 0),
       crossAxisSpacing: 0,
@@ -283,8 +281,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                   child: Image.network(
                     anime.imageUrl,
-                    width: 120,
-                    height: 180,
+                    width: 150,
+                    height: 225,
                   ),
                 ),
                 Container(
