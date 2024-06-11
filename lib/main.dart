@@ -40,7 +40,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int selectedIndex = -1;
-  String _storageKeyAnimeData = '';
+  final String _storageKeyAnimeData = 'animeData';
   Map<Weekday, List<Anime>>? _animeData;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _isLoading = true;
@@ -48,8 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
-    _storageKeyAnimeData = "animeData";
 
     _prefs.then((prefs) async {
       final String? animeDataString = prefs.getString(_storageKeyAnimeData);
@@ -68,6 +66,26 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _isLoading = false;
       });
+    });
+  }
+
+  Future<void> _updateAnime(Anime anime) async {
+    final SharedPreferences prefs = await _prefs;
+    print(anime);
+    await updateSingleAnimeInSharedPreferences(anime, prefs);
+
+    final String? animeDataString = prefs.getString(_storageKeyAnimeData);
+    print(animeDataString);
+    if (animeDataString != null) {
+      final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
+      _animeData = Map<Weekday, List<Anime>>.from(jsonMap.map(
+        (key, value) => MapEntry(WeekdayExtension.fromString(key),
+            (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
+      ));
+    }
+
+    setState(() {
+      _animeData = _animeData;
     });
   }
 
@@ -244,16 +262,30 @@ class _MyHomePageState extends State<MyHomePage> {
     final int? correctionDate = anime.episode.correctionDate?.day;
 
     return GestureDetector(
-        onTap: () {},
+        onTap: () {
+          anime.notification = !anime.notification;
+          _updateAnime(anime);
+        },
         child: Center(
           child: SizedBox(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Image.network(
-                  anime.imageUrl,
-                  width: 120,
-                  height: 180,
+                ColorFiltered(
+                  colorFilter: anime.notification
+                      ? const ColorFilter.mode(
+                          Colors.transparent,
+                          BlendMode.saturation,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.grey,
+                          BlendMode.saturation,
+                        ),
+                  child: Image.network(
+                    anime.imageUrl,
+                    width: 120,
+                    height: 180,
+                  ),
                 ),
                 Container(
                   constraints: const BoxConstraints(
