@@ -245,12 +245,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget buildGrid(List<Anime> animeList) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double spacing = screenWidth * 0.04;
+
     return GridView.count(
       shrinkWrap: true,
-      childAspectRatio: 0.52,
+      childAspectRatio: screenWidth / screenHeight,
       primary: false,
-      padding: const EdgeInsets.only(left: 0, right: 0),
-      crossAxisSpacing: 0,
+      padding: EdgeInsets.symmetric(horizontal: spacing),
+      crossAxisSpacing: spacing,
       mainAxisSpacing: 0,
       crossAxisCount: 2,
       children: List.generate(
@@ -287,52 +291,45 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                   child: Image.network(
                     anime.imageUrl,
-                    width: 150,
-                    height: 225,
                   ),
                 ),
-                Container(
-                  constraints: const BoxConstraints(
-                    maxWidth: 120,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        anime.title,
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 244, 117, 33),
-                        ),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      anime.title,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 244, 117, 33),
                       ),
-                      if (anime.episode.correctionDate == null)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '$releaseHour:$releaseMinute Uhr',
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (anime.episode.correctionDate == null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$releaseHour:$releaseMinute Uhr',
+                            style: const TextStyle(
+                              color: Colors.white,
                             ),
-                            Text(
-                              anime.episode.episode,
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        )
-                      else
-                        Text(
-                          '$correctionDate',
-                          style: const TextStyle(
-                            color: Colors.white,
                           ),
+                          Text(
+                            anime.episode.episode,
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Text(
+                        '$correctionDate',
+                        style: const TextStyle(
+                          color: Colors.white,
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ],
             ),
