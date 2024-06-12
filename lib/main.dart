@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
-Future<void> main() async {
+void main() {
   runApp(const MyApp());
 }
 
@@ -45,7 +45,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int selectedIndex = -1;
+  int selectedIndex = 0;
+  final String _storageKeyFilterIndex = 'filter';
   final String _storageKeyAnimeData = 'animeData';
   Map<Weekday, List<Anime>>? _animeData;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -56,6 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     _prefs.then((prefs) async {
+      final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
+      if (filterIndex != null) {
+        selectedIndex = filterIndex;
+      }
+
       final String? animeDataString = prefs.getString(_storageKeyAnimeData);
 
       if (animeDataString != null) {
@@ -68,13 +74,19 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         _animeData = await fetchAndGroupAnimeByWeekday();
         _animeData = sortAnimeByCurrentWeekday(_animeData!);
-        await saveAnimeDataToSharedPreferences(_animeData!, prefs);
+        await saveAnimeDataToSharedPreferences(
+            _animeData!, prefs, _storageKeyAnimeData);
       }
 
       setState(() {
         _isLoading = false;
       });
     });
+  }
+
+  Future<void> _updateFilterIndex(int index, String storageKeyAnimeData) async {
+    final SharedPreferences prefs = await _prefs;
+    prefs.setInt(storageKeyAnimeData, index);
   }
 
   Future<void> _updateAnime(Anime anime) async {
@@ -156,7 +168,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: OutlinedButton(
                               onPressed: () {
                                 setState(() {
-                                  selectedIndex = selectedIndex == 0 ? -1 : 0;
+                                  selectedIndex = 0;
+                                  _updateFilterIndex(0, _storageKeyFilterIndex);
                                 });
                               },
                               style: OutlinedButton.styleFrom(
@@ -167,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               child: Text(
-                                'Deaktivierte',
+                                'Alle',
                                 style: TextStyle(
                                   color: selectedIndex == 0
                                       ? Colors.white
@@ -185,7 +198,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: OutlinedButton(
                               onPressed: () {
                                 setState(() {
-                                  selectedIndex = selectedIndex == 1 ? -1 : 1;
+                                  selectedIndex = 1;
+                                  _updateFilterIndex(1, _storageKeyFilterIndex);
                                 });
                               },
                               style: OutlinedButton.styleFrom(
@@ -196,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               child: Text(
-                                'Aktivierte',
+                                'Abonnierte',
                                 style: TextStyle(
                                   color: selectedIndex == 1
                                       ? Colors.white
@@ -276,6 +290,9 @@ class _MyHomePageState extends State<MyHomePage> {
           anime.notification = !anime.notification;
           _updateAnime(anime);
         },
+        onLongPressStart: (LongPressStartDetails details) {
+          _showCustomMenu(details.globalPosition);
+        },
         child: Center(
           child: SizedBox(
             child: Column(
@@ -337,5 +354,56 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ));
+  }
+
+  void _showCustomMenu(Offset position) {
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy,
+        position.dx,
+        position.dy,
+      ),
+      color: const Color.fromARGB(121, 0, 0, 0),
+      items: <PopupMenuEntry>[
+        PopupMenuItem(
+          child: Center(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: const Color.fromARGB(0, 33, 149, 243),
+                  width: 2.0,
+                ),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Button Aktion
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                  textStyle: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                child: const Text(
+                  'Anschauen',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

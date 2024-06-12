@@ -12,8 +12,8 @@ Future<Map<Weekday, List<Anime>>> fetchAndGroupAnimeByWeekday() async {
 }
 
 Future<List<Anime>> fetchData() async {
-  final response = await http.get(Uri.parse(
-      'https://crunchytransmitter.ddns.net/CrunchyTransmitter-1.0-SNAPSHOT/anime'));
+  final response = await http.get(
+      Uri.parse('http://172.24.223.83/CrunchyTransmitter-1.0-SNAPSHOT/anime'));
 
   if (response.statusCode == 200) {
     List<dynamic> data = jsonDecode(response.body);
@@ -35,13 +35,28 @@ Map<Weekday, List<Anime>> groupAnimeByWeekday(List<Anime> animeList) {
   return animeMap;
 }
 
+Map<Weekday, List<Anime>> sortAnimeByCurrentWeekday(
+    Map<Weekday, List<Anime>> _animeData) {
+  final sortedWeekdays = WeekdayExtension.sortedByCurrentFirst();
+  final sortedAnimeData = <Weekday, List<Anime>>{};
+  for (var weekday in sortedWeekdays) {
+    if (_animeData!.containsKey(weekday)) {
+      sortedAnimeData[weekday] = _animeData![weekday]!;
+    }
+  }
+
+  return sortedAnimeData;
+}
+
 Future<void> saveAnimeDataToSharedPreferences(
-    Map<Weekday, List<Anime>> animeData, SharedPreferences prefs) async {
+    Map<Weekday, List<Anime>> animeData,
+    SharedPreferences prefs,
+    String storageKeyAnimeData) async {
   final String jsonString = jsonEncode(animeData.map((key, value) {
     return MapEntry(
         key.toString(), value.map((anime) => anime.toJson()).toList());
   }));
-  prefs.setString('animeData', jsonString);
+  prefs.setString(storageKeyAnimeData, jsonString);
 }
 
 Future<void> updateSingleAnimeInSharedPreferences(
