@@ -7,6 +7,7 @@ import 'package:crunchy_transmitter/weekday.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
@@ -291,7 +292,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _updateAnime(anime);
         },
         onLongPressStart: (LongPressStartDetails details) {
-          _showCustomMenu(details.globalPosition);
+          _showCustomMenu(details.globalPosition, anime.crunchyrollUrl);
         },
         child: Center(
           child: SizedBox(
@@ -356,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
-  void _showCustomMenu(Offset position) {
+  void _showCustomMenu(Offset position, String url) {
     showMenu(
       context: context,
       position: RelativeRect.fromLTRB(
@@ -378,8 +379,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: ElevatedButton(
-                onPressed: () {
-                  // Button Aktion
+                onPressed: () async {
+                  await launchUrl(Uri.parse(url));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 255, 255, 255),

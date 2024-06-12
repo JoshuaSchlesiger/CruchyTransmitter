@@ -5,6 +5,7 @@ class Anime {
   final String title;
   final Episode episode;
   final String imageUrl;
+  final String crunchyrollUrl;
   bool notification;
 
   Anime({
@@ -13,6 +14,7 @@ class Anime {
     required this.episode,
     required this.imageUrl,
     required this.notification,
+    required this.crunchyrollUrl,
   });
 
   factory Anime.fromJson(Map<String, dynamic> json) {
@@ -21,7 +23,8 @@ class Anime {
         title: json['title'],
         episode: Episode.fromJson(json['episode']),
         imageUrl: json['imageUrl'],
-        notification: false);
+        notification: false,
+        crunchyrollUrl: json['crunchyrollUrl']);
   }
   factory Anime.fromJsonInStorage(Map<String, dynamic> json) {
     return Anime(
@@ -29,7 +32,8 @@ class Anime {
         title: json['title'],
         episode: Episode.fromJsonInStorage(json['episode']),
         imageUrl: json['imageUrl'],
-        notification: json['notification']);
+        notification: json['notification'],
+        crunchyrollUrl: json['crunchyrollUrl']);
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +43,7 @@ class Anime {
       'episode': episode.toJson(),
       'imageUrl': imageUrl,
       'notification': notification,
+      'crunchyrollUrl': crunchyrollUrl,
     };
   }
 }
