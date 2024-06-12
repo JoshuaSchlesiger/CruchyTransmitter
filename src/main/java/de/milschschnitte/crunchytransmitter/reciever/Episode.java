@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Episode {
     private Integer episodeID;
@@ -63,7 +64,8 @@ public class Episode {
 
         String monthString = dateParts[1];
         
-        Month month = Month.from(DateTimeFormatter.ofPattern("MMMM").parse(monthString));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM", Locale.GERMAN);
+        Month month = Month.from(formatter.parse(monthString));
         
         int year = LocalDate.now().getYear();
         

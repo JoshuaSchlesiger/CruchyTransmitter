@@ -84,7 +84,14 @@ public class AnimeInfoExtractor {
 
                         int length = episodeRaw.length();
                         if(length < 4) continue;
-                        String episodeString = episodeRaw.substring(3, length - 3);
+
+                        int index = episodeRaw.indexOf('F');
+                        String episodeString = "";
+                        if (index != -1) {
+                            episodeString = episodeRaw.substring(index, length - 3);
+                        } else {
+                            episodeString = episodeRaw;
+                        }
 
                         Anime animeBuffer = animeList.get(animeList.size() - (cols.size() - j));
                         Episode episodeBuffer = animeBuffer.getEpisode();

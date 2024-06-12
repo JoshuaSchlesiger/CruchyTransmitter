@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,8 +228,10 @@ public class DatabaseManager {
 
         // Go forward to get Sunday
         LocalDate sunday = today;
+        LocalDateTime endOfSunday = null;
         while (sunday.getDayOfWeek() != DayOfWeek.SUNDAY) {
             sunday = sunday.plusDays(1);
+            endOfSunday = sunday.atTime(LocalTime.MAX);
         }
 
         String selectQueryEpisode = "SELECT id, anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE releaseTime >= ? AND releaseTime <= ?";
@@ -235,7 +239,7 @@ public class DatabaseManager {
         try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQueryEpisode)) {
                 selectStatement.setTimestamp(1, Timestamp.valueOf(monday.atStartOfDay()));
-                selectStatement.setTimestamp(2, Timestamp.valueOf(sunday.atStartOfDay()));
+                selectStatement.setTimestamp(2, Timestamp.valueOf(endOfSunday));
                 ResultSet resultSet = selectStatement.executeQuery();
 
                 List<Anime> animeList = new ArrayList<>();
