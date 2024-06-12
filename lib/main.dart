@@ -228,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ..._animeData!.entries.map((entry) {
                       return Column(
                         children: [
-                          buildSection(entry.key),
+                          buildSection(entry.key, entry.value),
                           buildGrid(entry.value),
                         ],
                       );
@@ -244,7 +244,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget buildSection(Weekday title) {
+  Widget buildSection(Weekday title, List<Anime> anime) {
+    final filteredAnimeList =
+        anime.where((anime) => !(selectedIndex == 1 && !anime.notification));
+
+    if (filteredAnimeList.isEmpty) {
+      return const SizedBox(height: 0);
+    }
+
     return Padding(
       padding: const EdgeInsets.only(top: 15, bottom: 15),
       child: Align(
@@ -274,8 +281,10 @@ class _MyHomePageState extends State<MyHomePage> {
       crossAxisSpacing: spacing,
       mainAxisSpacing: 0,
       crossAxisCount: 2,
-      children: List.generate(
-          animeList.length, (index) => buildGridItem(animeList[index])),
+      children: animeList
+          .where((anime) => !(selectedIndex == 1 && !anime.notification))
+          .map((anime) => buildGridItem(anime))
+          .toList(),
     );
   }
 
