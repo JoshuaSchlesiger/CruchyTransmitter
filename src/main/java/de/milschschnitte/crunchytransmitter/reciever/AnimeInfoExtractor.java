@@ -3,12 +3,16 @@ package de.milschschnitte.crunchytransmitter.reciever;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class AnimeInfoExtractor {
+    static Logger logger = LogManager.getLogger(AnimeInfoExtractor.class);
+        
     public static List<Anime> extractAnime(String html, EnumWeekdays weekday) {
         // Parse the HTML content
         Document doc = Jsoup.parse(html);
@@ -18,6 +22,7 @@ public class AnimeInfoExtractor {
         // Extracting datanull;
         Elements rows = doc.select("tr");
         List<String> imageUrlList = new ArrayList<String>();
+        List<String> crunchyrollUrlList = new ArrayList<String>();
 
         //The 1st and 2nd and 3rd only have relevant information
         /* Structure explaned
@@ -46,7 +51,10 @@ public class AnimeInfoExtractor {
                     if(i == 0){
                         String imageUrl = col.select("img").attr("src");
                         imageUrlList.add(imageUrl);
-                        //ImageUrl muss noch in die anime rein
+
+                        String crunchyrollUrl = col.select("a").attr("href");
+                        crunchyrollUrl = crunchyrollUrl.replace("\\\"", "").replace("\\\\", "\\");
+                        crunchyrollUrlList.add(crunchyrollUrl);
                         continue;
                     }
 
@@ -66,8 +74,10 @@ public class AnimeInfoExtractor {
 
                         if(j == 0) {
                             anime.setImageUrl(imageUrlList.get(j));
+                            anime.setCrunchyrollUrl(crunchyrollUrlList.get(j));
                         }else if (j == 1) {
                             anime.setImageUrl(imageUrlList.get(j));
+                            anime.setCrunchyrollUrl(crunchyrollUrlList.get(j));
                         }
 
                         animeList.add(anime);

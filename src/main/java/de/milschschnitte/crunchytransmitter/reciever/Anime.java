@@ -5,6 +5,7 @@ public class Anime {
     private String title;
     private Episode episode;
     private String imageUrl;
+    private String crunchyrollUrl;
 
     public Anime() {
         this.title = "";
@@ -12,11 +13,16 @@ public class Anime {
         this.imageUrl = "";
     }
 
-    public Anime(Episode episode, Integer animeId, String title, String imageUrl){
+    public Anime(Episode episode, Integer animeId, String title, String imageUrl, String crunchyrollUrl){
         this.episode = episode;
         this.animeId = animeId;
         this.title = title;
         this.imageUrl = imageUrl;
+        this.crunchyrollUrl = crunchyrollUrl;
+    }
+
+    public String getCrunchyrollUrl(){
+        return this.crunchyrollUrl;
     }
 
     public int getAnimeId(){
@@ -42,5 +48,9 @@ public class Anime {
     public void setImageUrl(String imageUrl) {
         String withoutBackslashes = imageUrl.replace("\\", "");
         this.imageUrl = withoutBackslashes.replace("\"", "");
+    }
+
+    public void setCrunchyrollUrl(String crunchyrollUrl){
+        this.crunchyrollUrl = crunchyrollUrl;
     }
 }

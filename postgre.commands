@@ -11,7 +11,8 @@ grant all privileges on database crunchytransmitter to crunchytransmitter;
 CREATE TABLE anime (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    imageurl VARCHAR(255) NOT NULL
+    imageurl VARCHAR(255) NOT NULL,
+    crunchyrollurl TEXT NOT NULL
 );
 
 CREATE TABLE episodes (

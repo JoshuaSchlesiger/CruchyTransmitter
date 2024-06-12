@@ -47,9 +47,9 @@ public class DatabaseManager {
      * @throws IOException
      */
     public static int insertOrUpdateAnime(Anime anime) throws SQLException {
-        String selectQuery = "SELECT id, imageurl FROM anime WHERE title = ?";
-        String updateQuery = "UPDATE anime SET imageurl = ? WHERE id = ?";
-        String insertQuery = "INSERT INTO anime (title, imageurl) VALUES (?, ?) RETURNING id";
+        String selectQuery = "SELECT id, imageurl, crunchyrollurl FROM anime WHERE title = ?";
+        String updateQuery = "UPDATE anime SET imageurl = ?, crunchyrollurl = ? WHERE id = ?";
+        String insertQuery = "INSERT INTO anime (title, imageurl, crunchyrollurl) VALUES (?, ?, ?) RETURNING id";
 
         try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
@@ -58,12 +58,27 @@ public class DatabaseManager {
 
                 if (resultSet.next()) {
                     int id = resultSet.getInt("id");
+                    
                     String existingImageUrl = resultSet.getString("imageurl");
+                    String existingCrunchyrollurl = resultSet.getString("crunchyrollurl");
+
 
                     if (!existingImageUrl.equals(anime.getImageUrl())) {
                         try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
                             updateStatement.setString(1, anime.getImageUrl());
-                            updateStatement.setInt(2, id);
+                            updateStatement.setString(2, anime.getCrunchyrollUrl());
+                            updateStatement.setInt(3, id);
+                            updateStatement.executeUpdate();
+
+                            logger.info("Updatet anime: " + id + ", notification will be send");
+                            // SEND UPDATE TO CLIENT WITH GOOGLE FCM ONLY ANIME INFORMATION
+                        }
+                    }
+                    else if (!existingCrunchyrollurl.equals(anime.getCrunchyrollUrl())) {
+                        try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                            updateStatement.setString(1, anime.getImageUrl());
+                            updateStatement.setString(2, anime.getCrunchyrollUrl());
+                            updateStatement.setInt(3, id);
                             updateStatement.executeUpdate();
 
                             logger.info("Updatet anime: " + id + ", notification will be send");
@@ -78,6 +93,7 @@ public class DatabaseManager {
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
                 insertStatement.setString(1, anime.getTitle());
                 insertStatement.setString(2, anime.getImageUrl());
+                insertStatement.setString(3, anime.getCrunchyrollUrl());
                 ResultSet resultSet = insertStatement.executeQuery();
 
                 if (resultSet.next()) {
@@ -178,15 +194,16 @@ public class DatabaseManager {
 
                 Episode episode = new Episode(id, episodeString, releaseTime, dateOfWeekday, dateOfCorrectionDate);
 
-                String selectQueryAnime = "SELECT title, imageurl FROM anime WHERE id = ?";
+                String selectQueryAnime = "SELECT title, imageurl, crunchyrollUrl FROM anime WHERE id = ?";
                 PreparedStatement animeStatement = connection.prepareStatement(selectQueryAnime);
                 animeStatement.setInt(1, animeId);
                 try (ResultSet animeResultSet = animeStatement.executeQuery()) {
                     if (animeResultSet.next()) {
                         String title = animeResultSet.getString("title");
                         String imageUrl = animeResultSet.getString("imageurl");
+                        String crunchyrollUrl = animeResultSet.getString("crunchyrollUrl");
 
-                        Anime anime = new Anime(episode, animeId, title, imageUrl);
+                        Anime anime = new Anime(episode, animeId, title, imageUrl, crunchyrollUrl);
                         notifiableAnimes.add(anime);
                     }
                 }
@@ -253,7 +270,7 @@ public class DatabaseManager {
 
                     Episode episode = new Episode(id, episodeNumber, releaseTime, weekday, correctionDate);
 
-                    String selectQueryAnime = "SELECT id, title, imageurl FROM anime WHERE id = ?";
+                    String selectQueryAnime = "SELECT id, title, imageurl, crunchyrollUrl FROM anime WHERE id = ?";
                     try (PreparedStatement selectStatementAnime = connection.prepareStatement(selectQueryAnime)) {
                         selectStatementAnime.setInt(1, animeId);
 
@@ -261,8 +278,9 @@ public class DatabaseManager {
                         if (animeResultSet.next()) {
                             String title = animeResultSet.getString("title");
                             String imageUrl = animeResultSet.getString("imageurl");
+                            String crunchyrollUrl = animeResultSet.getString("crunchyrollUrl");
 
-                            Anime anime = new Anime(episode, animeId, title, imageUrl);
+                            Anime anime = new Anime(episode, animeId, title, imageUrl, crunchyrollUrl);
                             animeList.add(anime);
                         } else {
                             logger.fatal("Can not find anime with id: " + animeId);
