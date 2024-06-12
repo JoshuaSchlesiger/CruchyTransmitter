@@ -6,6 +6,7 @@ import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   runApp(const MyApp());
@@ -16,8 +17,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'CrunchyTransmitter',
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 20, 20, 20)),
       home: const MyHomePage(title: 'Crunchy Transmitter'),
