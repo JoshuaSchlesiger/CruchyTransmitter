@@ -92,4 +92,20 @@ extension WeekdayExtension on Weekday {
         throw ArgumentError('Invalid weekday: $this');
     }
   }
+
+  static List<Weekday> sortedByCurrentFirst() {
+    final currentWeekday = WeekdayExtension.getWeekdayName(DateTime.now());
+    final weekdays = Weekday.values.toList();
+    final result = <Weekday>[];
+
+    for (var i = currentWeekday.index; i < weekdays.length; i++) {
+      result.add(weekdays[i]);
+    }
+
+    for (var i = 0; i < currentWeekday.index; i++) {
+      result.add(weekdays[i]);
+    }
+
+    return result;
+  }
 }

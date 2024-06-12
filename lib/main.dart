@@ -64,8 +64,10 @@ class _MyHomePageState extends State<MyHomePage> {
           (key, value) => MapEntry(WeekdayExtension.fromString(key),
               (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
         ));
+        _animeData = sortAnimeByCurrentWeekday(_animeData!);
       } else {
         _animeData = await fetchAndGroupAnimeByWeekday();
+        _animeData = sortAnimeByCurrentWeekday(_animeData!);
         await saveAnimeDataToSharedPreferences(_animeData!, prefs);
       }
 
