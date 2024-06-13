@@ -1,4 +1,4 @@
-package com.example.crunchy_transmitter
+package de.milschschnitte.crunchytransmitterunchy_transmitter
 
 import io.flutter.embedding.android.FlutterActivity
 
