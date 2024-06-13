@@ -8,8 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -53,10 +57,23 @@ class _MyHomePageState extends State<MyHomePage> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _isLoading = true;
 
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
   @override
   void initState() {
     super.initState();
 
+    _firebaseMessaging.requestPermission();
+
+    _firebaseMessaging.getToken().then((token) {
+      print("FCM Token: $token");
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Nachricht im Vordergrund: ${message.messageId}');
+    });
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     _prefs.then((prefs) async {
       final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
       if (filterIndex != null) {
@@ -405,4 +422,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     );
   }
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Nachricht im Hintergrund: ${message.messageId}');
 }
