@@ -123,17 +123,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(left: 16.0), // Versetzt nach rechts
-              child: Text(
-                "%Frühlingsseason ${DateTime.now().year}",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.0,
-                ),
-              ),
-            ),
           ],
         ),
         actions: [

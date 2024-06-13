@@ -36,12 +36,12 @@ Map<Weekday, List<Anime>> groupAnimeByWeekday(List<Anime> animeList) {
 }
 
 Map<Weekday, List<Anime>> sortAnimeByCurrentWeekday(
-    Map<Weekday, List<Anime>> _animeData) {
+    Map<Weekday, List<Anime>> animeData) {
   final sortedWeekdays = WeekdayExtension.sortedByCurrentFirst();
   final sortedAnimeData = <Weekday, List<Anime>>{};
   for (var weekday in sortedWeekdays) {
-    if (_animeData!.containsKey(weekday)) {
-      sortedAnimeData[weekday] = _animeData![weekday]!;
+    if (animeData.containsKey(weekday)) {
+      sortedAnimeData[weekday] = animeData[weekday]!;
     }
   }
 
