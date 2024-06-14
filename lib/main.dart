@@ -268,21 +268,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget buildGrid(List<Anime> animeList) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double spacing = screenWidth * 0.04;
 
-    return GridView.count(
-      shrinkWrap: true,
-      childAspectRatio: screenWidth * 0.9 / screenHeight,
-      primary: false,
-      padding: EdgeInsets.symmetric(horizontal: spacing),
-      crossAxisSpacing: spacing,
-      mainAxisSpacing: 0,
-      crossAxisCount: 2,
-      children: animeList
-          .where((anime) => !(selectedIndex == 1 && !anime.notification))
-          .map((anime) => buildGridItem(anime))
-          .toList(),
+    return Column(
+      children: List.generate((animeList.length / 2).ceil(), (index) {
+        final startIndex = index * 2;
+        final endIndex = startIndex + 2;
+        final items = animeList.sublist(startIndex,
+            endIndex < animeList.length ? endIndex : animeList.length);
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: spacing),
+          child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: items.map((anime) {
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+                    child: buildGridItem(anime),
+                  ),
+                );
+              }).toList()),
+        );
+      }),
     );
   }
 
