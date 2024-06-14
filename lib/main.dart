@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       title: 'CrunchyTransmitter',
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 20, 20, 20)),
-      home: const MyHomePage(title: 'Crunchy Transmitter'),
+      home: const MyHomePage(title: 'CrunchyTransmitter'),
     );
   }
 }
@@ -140,7 +140,10 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
+                MaterialPageRoute(
+                    builder: (context) => SettingsPage(
+                          title: widget.title,
+                        )),
               );
             },
           ),
