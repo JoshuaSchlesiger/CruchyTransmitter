@@ -1,4 +1,5 @@
 import 'package:crunchy_transmitter/anime/anime.dart';
+import 'package:crunchy_transmitter/config.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -12,8 +13,7 @@ Future<Map<Weekday, List<Anime>>> fetchAndGroupAnimeByWeekday() async {
 }
 
 Future<List<Anime>> fetchData() async {
-  final response = await http.get(
-      Uri.parse('http://172.24.223.83/CrunchyTransmitter-1.0-SNAPSHOT/anime'));
+  final response = await http.get(Uri.parse(Config.serverUrl));
 
   if (response.statusCode == 200) {
     List<dynamic> data = jsonDecode(response.body);

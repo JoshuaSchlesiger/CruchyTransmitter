@@ -2,18 +2,22 @@ import 'dart:convert';
 
 import 'package:crunchy_transmitter/anime/anime.dart';
 import 'package:crunchy_transmitter/anime/anime_handler.dart';
+import 'package:crunchy_transmitter/fcm.dart';
 import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(FCM.firebaseMessagingBackgroundHandler);
+
   runApp(const MyApp());
 }
 
@@ -39,10 +43,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
   final String title;
 
   @override
@@ -54,26 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
   final String _storageKeyFilterIndex = 'filter';
   final String _storageKeyAnimeData = 'animeData';
   Map<Weekday, List<Anime>>? _animeData;
+
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _isLoading = true;
-
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
     super.initState();
+    FCM.instanceProcess();
 
-    _firebaseMessaging.requestPermission();
-
-    _firebaseMessaging.getToken().then((token) {
-      print("FCM Token: $token");
-    });
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Nachricht im Vordergrund: ${message.messageId}');
-    });
-
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     _prefs.then((prefs) async {
       final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
       if (filterIndex != null) {
@@ -281,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return GridView.count(
       shrinkWrap: true,
-      childAspectRatio: screenWidth / screenHeight,
+      childAspectRatio: screenWidth * 0.9 / screenHeight,
       primary: false,
       padding: EdgeInsets.symmetric(horizontal: spacing),
       crossAxisSpacing: spacing,
@@ -300,6 +289,8 @@ class _MyHomePageState extends State<MyHomePage> {
         anime.episode.releaseTime.minute.toString().padLeft(2, '0');
 
     final int? correctionDate = anime.episode.correctionDate?.day;
+
+    final double imageHeight = MediaQuery.of(context).size.height * 0.32;
 
     return GestureDetector(
         onTap: () {
@@ -326,6 +317,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                   child: Image.network(
                     anime.imageUrl,
+                    height: imageHeight,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Column(
@@ -422,9 +415,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     );
   }
-}
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print('Nachricht im Hintergrund: ${message.messageId}');
 }
