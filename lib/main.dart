@@ -299,9 +299,28 @@ class _MyHomePageState extends State<MyHomePage> {
     final String releaseMinute =
         anime.episode.releaseTime.minute.toString().padLeft(2, '0');
 
-    final int? correctionDate = anime.episode.correctionDate?.day;
+    final Map<int, String> germanMonths = {
+      1: 'Januar',
+      2: 'Februar',
+      3: 'März',
+      4: 'April',
+      5: 'Mai',
+      6: 'Juni',
+      7: 'Juli',
+      8: 'August',
+      9: 'September',
+      10: 'Oktober',
+      11: 'November',
+      12: 'Dezember'
+    };
+    final day = anime.episode.dateOfCorretionDate?.day.toString();
+    final monthNumber = anime.episode.dateOfCorretionDate?.month;
+    final monthName = germanMonths[monthNumber];
+
+    final String dateOfCorretionDate = '$day. $monthName';
 
     final double imageHeight = MediaQuery.of(context).size.height * 0.32;
+    final double imageWidth = MediaQuery.of(context).size.width * 0.45;
 
     return GestureDetector(
         onTap: () {
@@ -328,6 +347,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                   child: Image.network(
                     anime.imageUrl,
+                    width: imageWidth,
                     height: imageHeight,
                     fit: BoxFit.cover,
                   ),
@@ -335,15 +355,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      anime.title,
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 244, 117, 33),
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: imageWidth, // Definiere hier die maximale Breite
                       ),
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
+                      child: Text(
+                        anime.title,
+                        style: const TextStyle(
+                          color: Color.fromARGB(255, 244, 117, 33),
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    if (anime.episode.correctionDate == null)
+                    if (anime.episode.dateOfCorretionDate == null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -363,7 +388,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       )
                     else
                       Text(
-                        '$correctionDate',
+                        'Komm am: $dateOfCorretionDate',
                         style: const TextStyle(
                           color: Colors.white,
                         ),
