@@ -2,19 +2,27 @@ import 'package:crunchy_transmitter/config.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FCM {
   static void instanceProcess() {
-    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+    final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
-    _firebaseMessaging.requestPermission();
+    firebaseMessaging.requestPermission();
 
-    _firebaseMessaging.getToken().then((token) {
+    firebaseMessaging.getToken().then((token) {
       print("FCM Token: $token");
 
-      http.post(Uri.parse(Config.serverUrl),
-          headers: {'password': Config.password},
-          body: {'token': token}).then((response) {
+      var body = jsonEncode({'token': token, 'password': Config.password});
+      http
+          .post(
+        Uri.parse(Config.serverUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      )
+          .then((response) {
         if (response.statusCode == 200) {
           print('Token erfolgreich an Server gesendet');
         } else {
