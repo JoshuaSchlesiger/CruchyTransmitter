@@ -269,26 +269,36 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget buildGrid(List<Anime> animeList) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double spacing = screenWidth * 0.04;
+    
+    List<Anime> filteredAnimeList = animeList;
+    if (selectedIndex == 1) {
+      filteredAnimeList =
+          animeList.where((anime) => anime.notification).toList();
+    }
 
     return Column(
-      children: List.generate((animeList.length / 2).ceil(), (index) {
+      children: List.generate((filteredAnimeList.length / 2).ceil(), (index) {
         final startIndex = index * 2;
         final endIndex = startIndex + 2;
-        final items = animeList.sublist(startIndex,
-            endIndex < animeList.length ? endIndex : animeList.length);
+        final items = filteredAnimeList.sublist(
+            startIndex,
+            endIndex < filteredAnimeList.length
+                ? endIndex
+                : filteredAnimeList.length);
 
         return Padding(
           padding: EdgeInsets.only(bottom: spacing),
           child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: items.map((anime) {
-                return Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: spacing / 2),
-                    child: buildGridItem(anime),
-                  ),
-                );
-              }).toList()),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: items.map((anime) {
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+                  child: buildGridItem(anime),
+                ),
+              );
+            }).toList(),
+          ),
         );
       }),
     );
@@ -357,7 +367,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: <Widget>[
                     Container(
                       constraints: BoxConstraints(
-                        maxWidth: imageWidth, // Definiere hier die maximale Breite
+                        maxWidth:
+                            imageWidth, // Definiere hier die maximale Breite
                       ),
                       child: Text(
                         anime.title,
