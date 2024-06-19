@@ -6,28 +6,19 @@ import 'package:crunchy_transmitter/fcm.dart';
 import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.requestNotificationsPermission();
-  
-  FirebaseMessaging.onBackgroundMessage(FCM.firebaseMessagingBackgroundHandler);
-
   runApp(const MyApp());
+  
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -67,19 +58,9 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = true;
 
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
     FCM.instanceProcess();
-
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-        //     flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        // onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
 
     _prefs.then((prefs) async {
       final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
