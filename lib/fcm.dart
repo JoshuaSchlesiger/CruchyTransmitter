@@ -58,7 +58,7 @@ class FCM {
             return;
           }
 
-          if (anime.animeId == messageJson["animeId"]) {
+          if (anime.episode.episodeID == messageJson["episodeID"]) {
             if (anime.notification) {
               foundAnime = true;
             }

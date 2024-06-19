@@ -67,14 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = true;
 
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
     FCM.instanceProcess();
 
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
