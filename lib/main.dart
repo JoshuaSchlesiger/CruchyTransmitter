@@ -11,11 +11,19 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp();
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestNotificationsPermission();
+  
   FirebaseMessaging.onBackgroundMessage(FCM.firebaseMessagingBackgroundHandler);
 
   runApp(const MyApp());
@@ -59,9 +67,19 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = true;
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
     FCM.instanceProcess();
+
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+        //     flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        // onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
 
     _prefs.then((prefs) async {
       final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
@@ -78,7 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
               (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
         ));
         _animeData = sortAnimeByCurrentWeekday(_animeData!);
-        await saveAnimeDataToSharedPreferences(_animeData!,  prefs, _storageKeyAnimeData);
+        await saveAnimeDataToSharedPreferences(
+            _animeData!, prefs, _storageKeyAnimeData);
       } else {
         _animeData = await fetchAndGroupAnimeByWeekday();
         _animeData = sortAnimeByCurrentWeekday(_animeData!);
@@ -114,6 +133,18 @@ class _MyHomePageState extends State<MyHomePage> {
       _animeData = _animeData;
     });
   }
+
+  // void onDidReceiveNotificationResponse(
+  //     NotificationResponse notificationResponse) async {
+  //   final String? payload = notificationResponse.payload;
+  //   if (notificationResponse.payload != null) {
+  //     debugPrint('notification payload: $payload');
+  //   }
+  //   await Navigator.push(
+  //     context,
+  //     MaterialPageRoute<void>(builder: (context) => SecondScreen(payload)),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -270,7 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget buildGrid(List<Anime> animeList) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double spacing = screenWidth * 0.04;
-    
+
     List<Anime> filteredAnimeList = animeList;
     if (selectedIndex == 1) {
       filteredAnimeList =
