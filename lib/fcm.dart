@@ -11,9 +11,9 @@ class FCM {
     firebaseMessaging.requestPermission();
 
     firebaseMessaging.getToken().then((token) {
-      print("FCM Token: $token");
+      // print("FCM Token: $token");
 
-      var body = jsonEncode({'token': token, 'password': Config.password});
+      String body = jsonEncode({'token': token, 'password': Config.password});
       http
           .post(
         Uri.parse(Config.serverUrl),
@@ -23,14 +23,14 @@ class FCM {
         body: body,
       )
           .then((response) {
-        if (response.statusCode == 200) {
-          print('Token erfolgreich an Server gesendet');
-        } else {
-          print(
-              'Fehler beim Senden des Tokens an den Server: ${response.statusCode}');
-        }
+        // if (response.statusCode == 200) {
+        //   print('Token erfolgreich an Server gesendet');
+        // } else {
+        //   print(
+        //       'Fehler beim Senden des Tokens an den Server: ${response.statusCode}');
+        // }
       }).catchError((error) {
-        print('Fehler beim Senden des Tokens an den Server: $error');
+        // print('Fehler beim Senden des Tokens an den Server: $error');
       });
     });
   }
@@ -38,6 +38,6 @@ class FCM {
   static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     await Firebase.initializeApp();
-    print('Nachricht im Hintergrund: ${message.messageId}');
+    // print('Nachricht im Hintergrund: ${message.messageId}');
   }
 }
