@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -146,9 +147,15 @@ public class DatabaseManager {
                             updateStatement.executeUpdate();
                             logger.info("Updated episode: " + id + ", correction notification will be send");
 
-                            Gson gson = new Gson();
-                            String episodeJson = gson.toJson(episode);
-                            NotificationService.sendNotificationInBlocks("update", episodeJson);
+                            Anime anime = getAnimeInformation(animeId);
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd");
+                            String formattedReleaseTime = dateFormat.format(episode.getReleaseTime());
+
+                            NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
+                                    anime.getTitle() + " - " + episode.getEpisode() + " - " + formattedReleaseTime,
+                                    animeId);
+
                         }
                     }
 
@@ -313,20 +320,28 @@ public class DatabaseManager {
         }
     }
 
-    public static List<String> getAllTokens() {
+    public static List<String> getAllTokensForAnime(Integer animeId) {
         List<String> tokens = new ArrayList<>();
-        String selectQuery = "SELECT token FROM tokens";
+        String selectQuery = "SELECT t.token " +
+                "FROM tokens t " +
+                "JOIN anime_tokens at ON t.id = at.token_id " +
+                "WHERE at.anime_id = ?";
 
         try (Connection connection = getConnection();
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(selectQuery)) {
+                PreparedStatement pstmt = connection.prepareStatement(selectQuery)) {
 
-            while (resultSet.next()) {
-                tokens.add(resultSet.getString("token"));
+            pstmt.setInt(1, animeId);
+
+            try (ResultSet resultSet = pstmt.executeQuery()) {
+                while (resultSet.next()) {
+                    tokens.add(resultSet.getString("token"));
+                }
             }
 
         } catch (SQLException e) {
-            logger.error("Error while retrieving tokens", e);
+            logger.error("Error while retrieving tokens for animeId " + animeId, e);
+        } catch (NumberFormatException e) {
+            logger.error("Invalid animeId provided: " + animeId, e);
         }
 
         return tokens;
@@ -357,7 +372,7 @@ public class DatabaseManager {
             }
 
             pstmtInsert.setString(1, token);
-            pstmtInsert.setInt(2, Integer.valueOf(animeId));
+            pstmtInsert.setInt(2, Integer.parseInt(animeId));
             pstmtInsert.executeUpdate();
             logger.info("New subscription for token " + token + " added for animeId " + animeId);
 
@@ -366,4 +381,29 @@ public class DatabaseManager {
         }
     }
 
+    public static Anime getAnimeInformation(int animeId) {
+        String selectQuery = "SELECT id, title, imageurl, crunchyrollurl FROM anime WHERE id = ?";
+        Anime anime = null;
+
+        try (Connection connection = getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(selectQuery)) {
+
+            pstmt.setInt(1, animeId);
+
+            try (ResultSet resultSet = pstmt.executeQuery()) {
+                if (resultSet.next()) {
+                    anime = new Anime();
+                    anime.setAnimeId(resultSet.getInt("id"));
+                    anime.setTitle(resultSet.getString("title"));
+                    anime.setImageUrl(resultSet.getString("imageurl"));
+                    anime.setCrunchyrollUrl(resultSet.getString("crunchyrollurl"));
+                }
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error while retrieving anime information for animeId " + animeId, e);
+        }
+
+        return anime;
+    }
 }

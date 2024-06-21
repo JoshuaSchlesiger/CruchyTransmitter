@@ -38,7 +38,10 @@ public class Episode {
     }
 
     public void setReleaseTime(String releaseTime){
-
+        if(releaseTime.equals("Keine Zeitinfos")){
+            return;
+        }
+        
         String[] parts = releaseTime.split(":");
         int hours = Integer.parseInt(parts[0]);
         int minutes = Integer.parseInt(parts[1].split(" ")[0]);

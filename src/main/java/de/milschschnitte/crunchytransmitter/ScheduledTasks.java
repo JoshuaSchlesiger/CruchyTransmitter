@@ -41,14 +41,12 @@ public class ScheduledTasks {
     private static void checkForPossibleNotification() {
         logger.info("Start checkForPossibleNotification");
         List<Anime> anime = DatabaseManager.getNotifiableAnime();
-        Gson gson = new Gson();
+        
         for (Anime animeElement : anime) {
             Episode episode = animeElement.getEpisode();
 
-            String episodeJson = gson.toJson(episode);
-
             //SENDING OUTCOMMING ANIME TO CLIENT WITH GOOGLE FCM
-            NotificationService.sendNotificationInBlocks("release", episodeJson);
+            NotificationService.sendNotificationInBlocks("Neue Folge !!!", animeElement.getTitle() + " - " + episode.getEpisode() + " kam heraus", animeElement.getAnimeId());
             DatabaseManager.setEpisodedPushed(episode.getEpisodeID());
         }
     }

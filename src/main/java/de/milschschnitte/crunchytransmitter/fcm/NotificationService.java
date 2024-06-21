@@ -19,25 +19,25 @@ public class NotificationService {
 
     static Logger logger = LogManager.getLogger(NotificationService.class);
 
-    public static void sendNotificationInBlocks(String notificationType, String body) {
-        List<String> tokens = DatabaseManager.getAllTokens();
+    public static void sendNotificationInBlocks(String notificationTitle, String body, Integer animeId) {
+        List<String> tokens = DatabaseManager.getAllTokensForAnime(animeId);
         int blockSize = 500;
 
         for (int i = 0; i < tokens.size(); i += blockSize) {
             List<String> blockTokens = tokens.subList(i, Math.min(i + blockSize, tokens.size()));
 
-            sendNotificationBlock(notificationType, body, blockTokens);
+            sendNotificationBlock(notificationTitle, body, blockTokens);
         }
 
         logger.info("Sended all notification to users");
     }
 
-    private static void sendNotificationBlock(String notificationType, String body, List<String> tokens) {
+    private static void sendNotificationBlock(String notificationTitle, String body, List<String> tokens) {
         List<Message> messages = new ArrayList<>();
 
         for (String token : tokens) {
             Message message = Message.builder()
-                    .setNotification(Notification.builder().setTitle(notificationType).setBody(body).build())
+                    .setNotification(Notification.builder().setTitle(notificationTitle).setBody(body).build())
                     .setToken(token)
                     .build();
             messages.add(message);

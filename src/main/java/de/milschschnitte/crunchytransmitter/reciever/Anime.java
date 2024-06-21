@@ -41,6 +41,10 @@ public class Anime {
         return this.imageUrl;
     }
 
+    public void setAnimeId(Integer id){
+        this.animeId = id;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
