@@ -19,13 +19,12 @@ CREATE TABLE episodes (
     id SERIAL PRIMARY KEY,
     anime_id INT NOT NULL,
     episode VARCHAR(255) NOT NULL,
-    releaseTime TIMESTAMP,
+    releaseTime TIMESTAMP NOT NULL,
     dateOfWeekday DATE NOT NULL,
     dateOfCorrectionDate DATE,
     sendedPushToUser BOOLEAN NOT NULL,
     FOREIGN KEY (anime_id) REFERENCES anime(id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE tokens (
     id SERIAL PRIMARY KEY,

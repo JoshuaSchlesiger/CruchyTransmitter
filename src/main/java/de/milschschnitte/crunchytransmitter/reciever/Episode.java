@@ -38,7 +38,7 @@ public class Episode {
     }
 
     public void setReleaseTime(String releaseTime){
-        if(releaseTime.equals("Keine Zeitinfos")){
+        if(releaseTime.equals("")){
             return;
         }
         

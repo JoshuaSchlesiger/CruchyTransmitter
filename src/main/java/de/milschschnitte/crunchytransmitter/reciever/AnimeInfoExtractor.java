@@ -94,7 +94,6 @@ public class AnimeInfoExtractor {
 
                         int length = episodeRaw.length();
                         if(length < 4) {
-                            logger.info("Faulty episodeString 1: " + episodeRaw);
                             continue;
                         }
 
@@ -104,16 +103,13 @@ public class AnimeInfoExtractor {
                             episodeString = episodeRaw.substring(index, length - 3);
                         } else {
                             logger.info("Faulty episodeString 2: " + episodeRaw);
+                            continue;
                         }
 
                         Anime animeBuffer = animeList.get(animeList.size() - (cols.size() - j));
                         Episode episodeBuffer = animeBuffer.getEpisode();
                         if(episodeBuffer.getEpisode() == "") episodeBuffer.setEpisodes(episodeString);
-                        if(episodeBuffer.getReleaseTime() == null) {
-                            if(!time.equals("")){
-                                episodeBuffer.setReleaseTime(time);
-                            }  
-                        }
+                        if(episodeBuffer.getReleaseTime() == null) episodeBuffer.setReleaseTime(time);
                         if(correctionDate != null) episodeBuffer.setDateOfCorretionDate(correctionDate);
 
                     } else {

@@ -32,6 +32,11 @@ public class ScheduledTasks {
 
         for (Anime anime : animeList) {
             int animeId = DatabaseManager.insertOrUpdateAnime(anime);
+            
+            if( anime.getEpisode().getReleaseTime() == null || anime.getEpisode().getEpisode() == ""){
+                continue;
+            }
+
             DatabaseManager.insertOrUpdateEpisode(animeId, anime.getEpisode());
         }
         logger.info("Anime databse input done");
