@@ -28,7 +28,7 @@ CREATE TABLE episodes (
 
 CREATE TABLE tokens (
     id SERIAL PRIMARY KEY,
-    token VARCHAR(255)
+    token VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE anime_tokens (

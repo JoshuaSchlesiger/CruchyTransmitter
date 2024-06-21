@@ -94,8 +94,8 @@ public class BaseDataController {
         });
 
         if (bucket.tryConsume(1)) {
-            DatabaseManager.changeAnimeSub(requestBody.getToken() , requestBody.getAnimeID());
-            return ResponseEntity.ok("successful");
+            String result = DatabaseManager.changeAnimeSub(requestBody.getToken() , requestBody.getAnimeID());
+            return ResponseEntity.ok(result);
         }
 
         logger.warn("Someone is greeeeeedy at post updateAnimeSub: " + ipAddress);

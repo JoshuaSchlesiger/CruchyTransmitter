@@ -347,7 +347,7 @@ public class DatabaseManager {
         return tokens;
     }
 
-    public static void changeAnimeSub(String token, String animeId) {
+    public static String changeAnimeSub(String token, String animeId) {
         String selectQuery = "SELECT 1 FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?)";
 
         String insertQuery = "INSERT INTO anime_tokens (token_id, anime_id) " +
@@ -368,16 +368,18 @@ public class DatabaseManager {
                 pstmtDelete.setString(1, token);
                 pstmtDelete.executeUpdate();
                 logger.info("Existing subscription for token " + token + " deleted. Animeid: " + animeId);
-                return;
+                return "deleted";
             }
 
             pstmtInsert.setString(1, token);
             pstmtInsert.setInt(2, Integer.parseInt(animeId));
             pstmtInsert.executeUpdate();
             logger.info("New subscription for token " + token + " added for animeId " + animeId);
+            return "added";
 
         } catch (SQLException e) {
             logger.error("Error while updating anime subscription for token " + token, e);
+            return "error";
         }
     }
 
