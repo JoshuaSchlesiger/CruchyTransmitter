@@ -95,6 +95,7 @@ public class AnimeInfoExtractor {
                         int length = episodeRaw.length();
                         if(length < 4) {
                             animeList.remove(animeList.size() - (cols.size() - j));
+                            logger.info("Faulty episodeString: " + episodeRaw);
                             continue;
                         }
 
@@ -104,6 +105,7 @@ public class AnimeInfoExtractor {
                             episodeString = episodeRaw.substring(index, length - 3);
                         } else {
                             animeList.remove(animeList.size() - (cols.size() - j));
+                            logger.info("Faulty episodeString: " + episodeRaw);
                             continue;
                         }
 
