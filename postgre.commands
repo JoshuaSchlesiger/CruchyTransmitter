@@ -23,12 +23,23 @@ CREATE TABLE episodes (
     dateOfWeekday DATE NOT NULL,
     dateOfCorrectionDate DATE,
     sendedPushToUser BOOLEAN NOT NULL,
-    FOREIGN KEY (anime_id) REFERENCES anime(id)
+    FOREIGN KEY (anime_id) REFERENCES anime(id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE tokens (
-    token VARCHAR(255) PRIMARY KEY
+    id SERIAL PRIMARY KEY,
+    token VARCHAR(255)
 );
 
-GRANT SELECT, UPDATE, INSERT, DELETE ON anime,episodes,tokens TO crunchytransmitter;
-GRANT USAGE, SELECT ON SEQUENCE anime_id_seq, episodes_id_seq TO crunchytransmitter;
+CREATE TABLE anime_tokens (
+    token_id INT NOT NULL,
+    anime_id INT NOT NULL,
+    
+    FOREIGN KEY (token_id) REFERENCES tokens(id) ON DELETE CASCADE,
+    FOREIGN KEY (anime_id) REFERENCES anime(id) ON DELETE CASCADE
+);
+
+
+GRANT SELECT, UPDATE, INSERT, DELETE ON anime,episodes,tokens,anime_tokens TO crunchytransmitter;
+GRANT USAGE, SELECT ON SEQUENCE anime_id_seq, episodes_id_seq, tokens_id_seq TO crunchytransmitter;
