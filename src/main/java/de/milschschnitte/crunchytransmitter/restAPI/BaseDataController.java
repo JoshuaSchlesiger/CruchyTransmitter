@@ -38,7 +38,7 @@ public class BaseDataController {
         Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
             Bandwidth limit = Bandwidth.classic(
                     Integer.valueOf(ConfigLoader.getProperty("spring.api.animeget.storage")),
-                    Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.animeget.reffill")),
+                    Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.animeget.refill")),
                             Duration.ofMinutes(1)));
             return Bucket.builder().addLimit(limit).build();
         });

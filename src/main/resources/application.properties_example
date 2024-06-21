@@ -12,8 +12,8 @@ spring.api.key = string
 spring.api.token.refill = 1
 spring.api.token.storage = 1
 
-spring.api.animeget.reffill = 50
+spring.api.animeget.refill = 50
 spring.api.animeget.storage = 250
 
-spring.api.animesub.reffill = 120
+spring.api.animesub.refill = 120
 spring.api.animesub.storage = 120
