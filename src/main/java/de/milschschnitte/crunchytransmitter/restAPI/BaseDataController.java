@@ -48,7 +48,7 @@ public class BaseDataController {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests");
     }
 
-    @PostMapping("/anime")
+    @PostMapping("/registerToken")
     public ResponseEntity<String> postFCMToken(HttpServletRequest request, @RequestBody FCMTokenPostRequest requestBody) {
         String password = requestBody.getPassword();
         String ipAddress = request.getRemoteAddr();
