@@ -150,11 +150,17 @@ public class DatabaseManager {
                             Anime anime = getAnimeInformation(animeId);
 
                             SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd");
-                            String formattedReleaseTime = dateFormat.format(episode.getReleaseTime());
+                            if (episode.getReleaseTime() != null) {
+                                String formattedReleaseTime = dateFormat.format(episode.getReleaseTime());
 
-                            NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
-                                    anime.getTitle() + " - " + episode.getEpisode() + " - " + formattedReleaseTime,
-                                    animeId);
+                                NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
+                                        anime.getTitle() + " - " + episode.getEpisode() + " - " + formattedReleaseTime,
+                                        animeId);
+                            } else {
+                                NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
+                                        anime.getTitle() + " - " + episode.getEpisode(),
+                                        animeId);
+                            }
 
                         }
                     }

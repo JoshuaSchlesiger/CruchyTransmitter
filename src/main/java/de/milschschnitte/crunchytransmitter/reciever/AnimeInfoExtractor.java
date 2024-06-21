@@ -86,16 +86,15 @@ public class AnimeInfoExtractor {
 
                     Elements pElements = col.select("p");
                     if (!pElements.isEmpty() && animeList.size() != 0) {
-                        String episodeRaw = pElements.size() > 0 ? pElements.get(0).text() : "Keine Episodeninfos";
-                        String time = pElements.size() > 1 ? pElements.get(1).text() : "Keine Zeitinfos";
+                        String episodeRaw = pElements.size() > 0 ? pElements.get(0).text() : "";
+                        String time = pElements.size() > 1 ? pElements.get(1).text() : "";
 
                         String correctionDate = null;
                         if(time.endsWith("*")) correctionDate = pElements.get(2).text();
 
                         int length = episodeRaw.length();
                         if(length < 4) {
-                            animeList.remove(animeList.size() - (cols.size() - j));
-                            logger.info("Faulty episodeString: " + episodeRaw);
+                            logger.info("Faulty episodeString 1: " + episodeRaw);
                             continue;
                         }
 
@@ -104,15 +103,17 @@ public class AnimeInfoExtractor {
                         if (index != -1) {
                             episodeString = episodeRaw.substring(index, length - 3);
                         } else {
-                            animeList.remove(animeList.size() - (cols.size() - j));
-                            logger.info("Faulty episodeString: " + episodeRaw);
-                            continue;
+                            logger.info("Faulty episodeString 2: " + episodeRaw);
                         }
 
                         Anime animeBuffer = animeList.get(animeList.size() - (cols.size() - j));
                         Episode episodeBuffer = animeBuffer.getEpisode();
                         if(episodeBuffer.getEpisode() == "") episodeBuffer.setEpisodes(episodeString);
-                        if(episodeBuffer.getReleaseTime() == null) episodeBuffer.setReleaseTime(time);
+                        if(episodeBuffer.getReleaseTime() == null) {
+                            if(!time.equals("")){
+                                episodeBuffer.setReleaseTime(time);
+                            }  
+                        }
                         if(correctionDate != null) episodeBuffer.setDateOfCorretionDate(correctionDate);
 
                     } else {
