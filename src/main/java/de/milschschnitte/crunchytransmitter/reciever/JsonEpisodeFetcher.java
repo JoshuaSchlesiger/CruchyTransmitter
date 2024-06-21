@@ -75,7 +75,7 @@ public class JsonEpisodeFetcher {
                                 }
 
                                 try {
-                                    JsonNode horizontalLineNode = elementNode.get("content").get("content").get(0).get("type");
+                                    // JsonNode horizontalLineNode = elementNode.get("content").get("content").get(0).get("type");
                                     continue;
                                 } catch (NullPointerException e) {
                                     // System.out.println("skip horizontal");
