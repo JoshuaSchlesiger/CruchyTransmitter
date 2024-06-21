@@ -348,12 +348,12 @@ public class DatabaseManager {
     }
 
     public static String changeAnimeSub(String token, String animeId) {
-        String selectQuery = "SELECT 1 FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?)";
+        String selectQuery = "SELECT 1 FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?) AND WHERE anime_id = ?";
 
         String insertQuery = "INSERT INTO anime_tokens (token_id, anime_id) " +
                 "VALUES ((SELECT id FROM tokens WHERE token = ?), ?)";
 
-        String deleteQuery = "DELETE FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?)";
+        String deleteQuery = "DELETE FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?) AND WHERE anime_id = ?";
 
         try (Connection connection = getConnection();
                 PreparedStatement pstmtSelect = connection.prepareStatement(selectQuery);
@@ -361,11 +361,13 @@ public class DatabaseManager {
                 PreparedStatement pstmtDelete = connection.prepareStatement(deleteQuery)) {
 
             pstmtSelect.setString(1, token);
+            pstmtSelect.setInt(2, Integer.parseInt(animeId));
 
             ResultSet resultSet = pstmtSelect.executeQuery();
 
             if (resultSet.next()) {
                 pstmtDelete.setString(1, token);
+                pstmtDelete.setInt(2, Integer.parseInt(animeId));
                 pstmtDelete.executeUpdate();
                 logger.info("Existing subscription for token " + token + " deleted. Animeid: " + animeId);
                 return "deleted";
