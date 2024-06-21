@@ -27,7 +27,7 @@ public class BaseDataController {
     Logger logger = LogManager.getLogger(BaseDataController.class);
     private final Map<String, Bucket> buckets;
 
-    public BaseDataController(){
+    public BaseDataController() {
         this.buckets = new ConcurrentHashMap<>();
     }
 
@@ -36,11 +36,14 @@ public class BaseDataController {
         logger.info("Access to /anime Website");
         String ipAddress = request.getRemoteAddr();
         Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
-            Bandwidth limit = Bandwidth.classic(5, Refill.greedy(1, Duration.ofMinutes(1)));
+            Bandwidth limit = Bandwidth.classic(
+                    Integer.valueOf(ConfigLoader.getProperty("spring.api.animeget.storage")),
+                    Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.animeget.reffill")),
+                            Duration.ofMinutes(1)));
             return Bucket.builder().addLimit(limit).build();
         });
 
-        if(bucket.tryConsume(1)){
+        if (bucket.tryConsume(1)) {
             return ResponseEntity.ok(ScheduledTasks.json);
         }
 
@@ -49,7 +52,8 @@ public class BaseDataController {
     }
 
     @PostMapping("/registerToken")
-    public ResponseEntity<String> postFCMToken(HttpServletRequest request, @RequestBody FCMTokenPostRequest requestBody) {
+    public ResponseEntity<String> postFCMToken(HttpServletRequest request,
+            @RequestBody FCMTokenPostRequest requestBody) {
         String password = requestBody.getPassword();
         String ipAddress = request.getRemoteAddr();
 
@@ -57,13 +61,13 @@ public class BaseDataController {
             logger.info("Someone tried to register with wrong password. IP-Address: " + ipAddress);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
-        
+
         Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
-            Bandwidth limit = Bandwidth.classic(5, Refill.greedy(1, Duration.ofMinutes(5)));
+            Bandwidth limit = Bandwidth.classic(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.storage")), Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.refill")), Duration.ofMinutes(1)));
             return Bucket.builder().addLimit(limit).build();
         });
 
-        if(bucket.tryConsume(1)){
+        if (bucket.tryConsume(1)) {
             DatabaseManager.setToken(requestBody.getToken());
             return ResponseEntity.ok("successful");
         }
