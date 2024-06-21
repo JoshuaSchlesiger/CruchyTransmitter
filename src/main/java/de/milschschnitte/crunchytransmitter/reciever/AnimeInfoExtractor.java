@@ -93,14 +93,18 @@ public class AnimeInfoExtractor {
                         if(time.endsWith("*")) correctionDate = pElements.get(2).text();
 
                         int length = episodeRaw.length();
-                        if(length < 4) continue;
+                        if(length < 4) {
+                            animeList.remove(animeList.size() - (cols.size() - j));
+                            continue;
+                        }
 
                         int index = episodeRaw.indexOf('F');
                         String episodeString = "";
                         if (index != -1) {
                             episodeString = episodeRaw.substring(index, length - 3);
                         } else {
-                            episodeString = episodeRaw;
+                            animeList.remove(animeList.size() - (cols.size() - j));
+                            continue;
                         }
 
                         Anime animeBuffer = animeList.get(animeList.size() - (cols.size() - j));
