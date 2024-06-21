@@ -58,10 +58,9 @@ public class DatabaseManager {
 
                 if (resultSet.next()) {
                     int id = resultSet.getInt("id");
-                    
+
                     String existingImageUrl = resultSet.getString("imageurl");
                     String existingCrunchyrollurl = resultSet.getString("crunchyrollurl");
-
 
                     if (!existingImageUrl.equals(anime.getImageUrl())) {
                         try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
@@ -73,8 +72,7 @@ public class DatabaseManager {
                             logger.info("Updatet anime: " + id + ", notification will be send");
                             // SEND UPDATE TO CLIENT WITH GOOGLE FCM ONLY ANIME INFORMATION
                         }
-                    }
-                    else if (!existingCrunchyrollurl.equals(anime.getCrunchyrollUrl())) {
+                    } else if (!existingCrunchyrollurl.equals(anime.getCrunchyrollUrl())) {
                         try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
                             updateStatement.setString(1, anime.getImageUrl());
                             updateStatement.setString(2, anime.getCrunchyrollUrl());
@@ -332,6 +330,40 @@ public class DatabaseManager {
         }
 
         return tokens;
+    }
+
+    public static void changeAnimeSub(String token, String animeId) {
+        String selectQuery = "SELECT 1 FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?)";
+
+        String insertQuery = "INSERT INTO anime_tokens (token_id, anime_id) " +
+                "VALUES ((SELECT id FROM tokens WHERE token = ?), ?)";
+
+        String deleteQuery = "DELETE FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?)";
+
+        try (Connection connection = getConnection();
+                PreparedStatement pstmtSelect = connection.prepareStatement(selectQuery);
+                PreparedStatement pstmtInsert = connection.prepareStatement(insertQuery);
+                PreparedStatement pstmtDelete = connection.prepareStatement(deleteQuery)) {
+
+            pstmtSelect.setString(1, token);
+
+            ResultSet resultSet = pstmtSelect.executeQuery();
+
+            if (resultSet.next()) {
+                pstmtDelete.setString(1, token);
+                pstmtDelete.executeUpdate();
+                logger.info("Existing subscription for token " + token + " deleted. Animeid: " + animeId);
+                return;
+            }
+
+            pstmtInsert.setString(1, token);
+            pstmtInsert.setInt(2, Integer.valueOf(animeId));
+            pstmtInsert.executeUpdate();
+            logger.info("New subscription for token " + token + " added for animeId " + animeId);
+
+        } catch (SQLException e) {
+            logger.error("Error while updating anime subscription for token " + token, e);
+        }
     }
 
 }

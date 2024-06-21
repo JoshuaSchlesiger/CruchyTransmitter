@@ -3,6 +3,7 @@ package de.milschschnitte.crunchytransmitter.restAPI;
 public class AnimeSubPostRequest {
     private String password;
     private String animeID;
+    private String token;
 
     public String getPassword() {
         return password;
@@ -18,5 +19,13 @@ public class AnimeSubPostRequest {
 
     public void setAnimeID(String animeID) {
         this.animeID = animeID;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

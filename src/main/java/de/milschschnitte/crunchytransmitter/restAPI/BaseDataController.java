@@ -89,12 +89,12 @@ public class BaseDataController {
         }
 
         Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
-            Bandwidth limit = Bandwidth.classic(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.storage")), Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.refill")), Duration.ofMinutes(1)));
+            Bandwidth limit = Bandwidth.classic(Integer.valueOf(ConfigLoader.getProperty("spring.api.animesub.storage")), Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.animesub.refill")), Duration.ofMinutes(1)));
             return Bucket.builder().addLimit(limit).build();
         });
 
         if (bucket.tryConsume(1)) {
-            //Database input
+            DatabaseManager.changeAnimeSub(requestBody.getToken() , requestBody.getAnimeID());
             return ResponseEntity.ok("successful");
         }
 

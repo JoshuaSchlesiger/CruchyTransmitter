@@ -14,3 +14,6 @@ spring.api.token.storage = 1
 
 spring.api.animeget.reffill = 50
 spring.api.animeget.storage = 250
+
+spring.api.animesub.reffill = 120
+spring.api.animesub.storage = 120
