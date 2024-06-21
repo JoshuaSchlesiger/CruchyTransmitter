@@ -13,7 +13,7 @@ Future<Map<Weekday, List<Anime>>> fetchAndGroupAnimeByWeekday() async {
 }
 
 Future<List<Anime>> fetchData() async {
-  final response = await http.get(Uri.parse(Config.serverUrl));
+  final response = await http.get(Uri.parse("${Config.serverUrl}anime"));
 
   if (response.statusCode == 200) {
     List<dynamic> data = jsonDecode(response.body);

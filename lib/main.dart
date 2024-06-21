@@ -16,9 +16,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   runApp(const MyApp());
-  
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -56,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _isLoading = true;
+  Map<int, bool> _isLoadingMap = {};
 
   @override
   void initState() {
@@ -109,23 +108,10 @@ class _MyHomePageState extends State<MyHomePage> {
             (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
       ));
     }
-
     setState(() {
       _animeData = _animeData;
     });
   }
-
-  // void onDidReceiveNotificationResponse(
-  //     NotificationResponse notificationResponse) async {
-  //   final String? payload = notificationResponse.payload;
-  //   if (notificationResponse.payload != null) {
-  //     debugPrint('notification payload: $payload');
-  //   }
-  //   await Navigator.push(
-  //     context,
-  //     MaterialPageRoute<void>(builder: (context) => SecondScreen(payload)),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -346,82 +332,120 @@ class _MyHomePageState extends State<MyHomePage> {
     final double imageWidth = MediaQuery.of(context).size.width * 0.45;
 
     return GestureDetector(
-        onTap: () {
-          anime.notification = !anime.notification;
+        onTap: () async {
+          setState(() {
+            _isLoadingMap[anime.animeId] = true;
+          });
+
+          int responseCode = await FCM.changeSubscriptionAnime(anime.animeId);
+          if (responseCode == 1) {
+            anime.notification = true;
+          } else if (responseCode == 0) {
+            anime.notification = false;
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Fehler Yoshi'),
+                content: const Text(
+                    'Ich war wohl etwas schlampig. PS. Probiere es nochmal'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            );
+          }
           _updateAnime(anime);
+          setState(() {
+            _isLoadingMap[anime.animeId] = false;
+          });
         },
         onLongPressStart: (LongPressStartDetails details) {
           _showCustomMenu(details.globalPosition, anime.crunchyrollUrl);
         },
         child: Center(
-          child: SizedBox(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                ColorFiltered(
-                  colorFilter: anime.notification
-                      ? const ColorFilter.mode(
-                          Colors.transparent,
-                          BlendMode.saturation,
-                        )
-                      : const ColorFilter.mode(
-                          Colors.grey,
-                          BlendMode.saturation,
-                        ),
-                  child: Image.network(
-                    anime.imageUrl,
-                    width: imageWidth,
-                    height: imageHeight,
-                    fit: BoxFit.cover,
+          child: _isLoadingMap[anime.animeId]!
+              ? SizedBox(
+                  height: imageHeight,
+                  width: imageWidth,
+                  child: const Align(
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth:
-                            imageWidth, // Definiere hier die maximale Breite
-                      ),
-                      child: Text(
-                        anime.title,
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 244, 117, 33),
+                )
+              : SizedBox(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      ColorFiltered(
+                        colorFilter: anime.notification
+                            ? const ColorFilter.mode(
+                                Colors.transparent,
+                                BlendMode.saturation,
+                              )
+                            : const ColorFilter.mode(
+                                Colors.grey,
+                                BlendMode.saturation,
+                              ),
+                        child: Image.network(
+                          anime.imageUrl,
+                          width: imageWidth,
+                          height: imageHeight,
+                          fit: BoxFit.cover,
                         ),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    if (anime.episode.dateOfCorretionDate == null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$releaseHour:$releaseMinute Uhr',
-                            style: const TextStyle(
-                              color: Colors.white,
+                        children: <Widget>[
+                          Container(
+                            constraints: BoxConstraints(
+                              maxWidth:
+                                  imageWidth, // Definiere hier die maximale Breite
+                            ),
+                            child: Text(
+                              anime.title,
+                              style: const TextStyle(
+                                color: Color.fromARGB(255, 244, 117, 33),
+                              ),
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          Text(
-                            anime.episode.episode,
-                            style: const TextStyle(
-                              color: Colors.white,
+                          if (anime.episode.dateOfCorretionDate == null)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$releaseHour:$releaseMinute Uhr',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  anime.episode.episode,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            Text(
+                              'Komm am: $dateOfCorretionDate',
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
                         ],
-                      )
-                    else
-                      Text(
-                        'Komm am: $dateOfCorretionDate',
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
         ));
   }
 
