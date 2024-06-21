@@ -58,7 +58,7 @@ public class BaseDataController {
         String ipAddress = request.getRemoteAddr();
 
         if (password == null || !password.equals(ConfigLoader.getProperty("spring.api.key"))) {
-            logger.info("Someone tried to register with wrong password. IP-Address: " + ipAddress);
+            logger.info("Someone tried to register with wrong password. IP-Address: " + ipAddress + "on registerToken");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
@@ -72,7 +72,33 @@ public class BaseDataController {
             return ResponseEntity.ok("successful");
         }
 
-        logger.warn("Someone is greeeeeedy at post: " + ipAddress);
+        logger.warn("Someone is greeeeeedy at post registerToken: " + ipAddress);
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests");
+    }
+
+
+    @PostMapping("/updateAnimeSub")
+    public ResponseEntity<String> postAnimeSub(HttpServletRequest request,
+            @RequestBody AnimeSubPostRequest requestBody) {
+        String password = requestBody.getPassword();
+        String ipAddress = request.getRemoteAddr();
+
+        if (password == null || !password.equals(ConfigLoader.getProperty("spring.api.key"))) {
+            logger.info("Someone tried to register with wrong password. IP-Address: " + ipAddress + "on updateAnimeSub");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+        }
+
+        Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
+            Bandwidth limit = Bandwidth.classic(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.storage")), Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.refill")), Duration.ofMinutes(1)));
+            return Bucket.builder().addLimit(limit).build();
+        });
+
+        if (bucket.tryConsume(1)) {
+            //Database input
+            return ResponseEntity.ok("successful");
+        }
+
+        logger.warn("Someone is greeeeeedy at post updateAnimeSub: " + ipAddress);
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Too many requests");
     }
 }
