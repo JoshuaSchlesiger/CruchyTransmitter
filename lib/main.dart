@@ -76,13 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
         DateTime now = DateTime.now();
         int differenceInDays = now.difference(dateTimeUpdate).inDays;
 
-        if (now.weekNumber != dateTimeUpdate.weekNumber) {
-          await prefs.setInt(
-              _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
-
-          prefs.remove(_storageKeyAnimeData);
-
-        } else if (differenceInDays >= 1) {
+        if (differenceInDays >= 1 || now.weekNumber != dateTimeUpdate.weekNumber) {
           await prefs.setInt(
               _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
 
