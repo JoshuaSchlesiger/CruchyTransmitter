@@ -247,19 +247,23 @@ public class DatabaseManager {
         while (monday.getDayOfWeek() != DayOfWeek.MONDAY) {
             monday = monday.minusDays(1);
         }
-
         // Go forward to get Sunday
         LocalDate sunday = today;
         LocalDateTime endOfSunday = null;
-        while (sunday.getDayOfWeek() != DayOfWeek.SUNDAY) {
-            sunday = sunday.plusDays(1);
+        if(sunday.getDayOfWeek() == DayOfWeek.SUNDAY){
             endOfSunday = sunday.atTime(LocalTime.MAX);
+        }else{
+            while (sunday.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                sunday = sunday.plusDays(1);
+                endOfSunday = sunday.atTime(LocalTime.MAX);
+            }
         }
 
         String selectQueryEpisode = "SELECT id, anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE releaseTime >= ? AND releaseTime <= ?";
 
         try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQueryEpisode)) {
+
                 selectStatement.setTimestamp(1, Timestamp.valueOf(monday.atStartOfDay()));
                 selectStatement.setTimestamp(2, Timestamp.valueOf(endOfSunday));
                 ResultSet resultSet = selectStatement.executeQuery();
@@ -284,7 +288,7 @@ public class DatabaseManager {
                             String title = animeResultSet.getString("title");
                             String imageUrl = animeResultSet.getString("imageurl");
                             String crunchyrollUrl = animeResultSet.getString("crunchyrollUrl");
-
+        
                             Anime anime = new Anime(episode, animeId, title, imageUrl, crunchyrollUrl);
                             animeList.add(anime);
                         } else {
