@@ -78,10 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
         if (differenceInDays >= 1) {
           await prefs.setInt(
               _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
-              
+
           _animeData = await fetchAndGroupAnimeByWeekday();
 
-          final Map<String, dynamic> jsonMap = jsonDecode(_storageKeyAnimeData);
+          final String? animeDataString = prefs.getString(_storageKeyAnimeData);
+          final Map<String, dynamic> jsonMap = jsonDecode(animeDataString!);
           Map<Weekday, List<Anime>>? animeOldStorage =
               Map<Weekday, List<Anime>>.from(jsonMap.map(
             (key, value) => MapEntry(
@@ -94,14 +95,18 @@ class _MyHomePageState extends State<MyHomePage> {
           _animeData!.forEach((weekday, animeList) {
             if (animeOldStorage[weekday] != null) {
               for (Anime anime in animeList) {
-                Anime existingAnime = animeOldStorage[weekday]
-                    !.firstWhere((e) => e.animeId == anime.animeId);
+                Anime existingAnime = animeOldStorage[weekday]!
+                    .firstWhere((e) => e.animeId == anime.animeId);
                 if (existingAnime != null) {
                   anime.notification = existingAnime.notification;
                 }
               }
             }
           });
+
+          _animeData = sortAnimeByCurrentWeekday(_animeData!);
+          saveAnimeDataToSharedPreferences(
+              _animeData!, prefs, _storageKeyAnimeData);
         }
       }
 
@@ -110,9 +115,11 @@ class _MyHomePageState extends State<MyHomePage> {
         selectedIndex = filterIndex;
       }
 
-      final String? animeDataString = prefs.getString(_storageKeyAnimeData);
-      _animeData = await handleAnimeStorageAvailability(
-          animeDataString, _storageKeyAnimeData, prefs);
+      if (_animeData == null) {
+        final String? animeDataString = prefs.getString(_storageKeyAnimeData);
+        _animeData = await handleAnimeStorageAvailability(
+            animeDataString, _storageKeyAnimeData, prefs);
+      }
 
       setState(() {
         _isLoading = false;
