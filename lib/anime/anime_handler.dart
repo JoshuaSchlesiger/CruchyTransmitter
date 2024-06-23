@@ -61,10 +61,8 @@ Future<void> saveAnimeDataToSharedPreferences(
 
 Future<void> updateSingleAnimeInSharedPreferences(
     Anime anime, SharedPreferences prefs) async {
-// Lade die vorhandenen Daten aus den SharedPreferences
   final String? jsonString = prefs.getString('animeData');
 
-  // Konvertiere den JSON-String zurück in eine Map<Weekday, List<Anime>>
   final Map<String, dynamic> decodedData = jsonDecode(jsonString!);
   final Map<Weekday, List<Anime>> animeData = Map.fromEntries(
     decodedData.entries.map((entry) {
@@ -84,12 +82,10 @@ Future<void> updateSingleAnimeInSharedPreferences(
     animeData[weekday]?[index] = anime;
   }
 
-  // Konvertiere die aktualisierten Daten zurück in einen JSON-String
   final updatedJsonString = jsonEncode(animeData.map((key, value) {
     return MapEntry(
         key.toString(), value.map((anime) => anime.toJson()).toList());
   }));
 
-  // Speichere die aktualisierten Daten in den SharedPreferences
   await prefs.setString('animeData', updatedJsonString);
 }
