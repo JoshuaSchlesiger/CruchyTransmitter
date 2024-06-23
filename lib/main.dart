@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crunchy_transmitter/anime/anime.dart';
 import 'package:crunchy_transmitter/anime/anime_handler.dart';
 import 'package:crunchy_transmitter/fcm.dart';
+import 'package:crunchy_transmitter/handle_time.dart';
 import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -50,6 +51,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int selectedIndex = 0;
   final String _storageKeyFilterIndex = 'filter';
   final String _storageKeyAnimeData = 'animeData';
+  final String _storageKeyDateTimeUpdate = 'dateTimeUpdate';
+
   Map<Weekday, List<Anime>>? _animeData;
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -62,28 +65,54 @@ class _MyHomePageState extends State<MyHomePage> {
     FCM.instanceProcess();
 
     _prefs.then((prefs) async {
+      final DateTime? dateTimeUpdate =
+          await loadSavedTime(_storageKeyDateTimeUpdate, prefs);
+
+      if (dateTimeUpdate == null) {
+        await prefs.setInt(
+            _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
+      } else {
+        DateTime now = DateTime.now();
+        int differenceInDays = now.difference(dateTimeUpdate).inDays;
+
+        if (differenceInDays >= 1) {
+          await prefs.setInt(
+              _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
+              
+          _animeData = await fetchAndGroupAnimeByWeekday();
+
+          final Map<String, dynamic> jsonMap = jsonDecode(_storageKeyAnimeData);
+          Map<Weekday, List<Anime>>? animeOldStorage =
+              Map<Weekday, List<Anime>>.from(jsonMap.map(
+            (key, value) => MapEntry(
+                WeekdayExtension.fromString(key),
+                (value as List)
+                    .map((e) => Anime.fromJsonInStorage(e))
+                    .toList()),
+          ));
+
+          _animeData!.forEach((weekday, animeList) {
+            if (animeOldStorage[weekday] != null) {
+              for (Anime anime in animeList) {
+                Anime existingAnime = animeOldStorage[weekday]
+                    !.firstWhere((e) => e.animeId == anime.animeId);
+                if (existingAnime != null) {
+                  anime.notification = existingAnime.notification;
+                }
+              }
+            }
+          });
+        }
+      }
+
       final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
       if (filterIndex != null) {
         selectedIndex = filterIndex;
       }
 
       final String? animeDataString = prefs.getString(_storageKeyAnimeData);
-
-      if (animeDataString != null) {
-        final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
-        _animeData = Map<Weekday, List<Anime>>.from(jsonMap.map(
-          (key, value) => MapEntry(WeekdayExtension.fromString(key),
-              (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
-        ));
-        _animeData = sortAnimeByCurrentWeekday(_animeData!);
-        await saveAnimeDataToSharedPreferences(
-            _animeData!, prefs, _storageKeyAnimeData);
-      } else {
-        _animeData = await fetchAndGroupAnimeByWeekday();
-        _animeData = sortAnimeByCurrentWeekday(_animeData!);
-        await saveAnimeDataToSharedPreferences(
-            _animeData!, prefs, _storageKeyAnimeData);
-      }
+      _animeData = await handleAnimeStorageAvailability(
+          animeDataString, _storageKeyAnimeData, prefs);
 
       setState(() {
         _isLoading = false;
@@ -344,11 +373,12 @@ class _MyHomePageState extends State<MyHomePage> {
             anime.notification = false;
           } else {
             showDialog(
+              // ignore: use_build_context_synchronously
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text('Fehler Yoshi'),
                 content: const Text(
-                    'Ich war wohl etwas schlampig. PS. Probiere es nochmal'),
+                    'Ich war wohl etwas schlampig. PS. Probiere es nochmal . PPS. Vielleicht Server überlastet?!'),
                 actions: <Widget>[
                   TextButton(
                     child: const Text('OK'),
@@ -369,7 +399,8 @@ class _MyHomePageState extends State<MyHomePage> {
           _showCustomMenu(details.globalPosition, anime.crunchyrollUrl);
         },
         child: Center(
-          child: _isLoadingMap[anime.animeId] != null && _isLoadingMap[anime.animeId]!
+          child: _isLoadingMap[anime.animeId] != null &&
+                  _isLoadingMap[anime.animeId]!
               ? SizedBox(
                   height: imageHeight,
                   width: imageWidth,

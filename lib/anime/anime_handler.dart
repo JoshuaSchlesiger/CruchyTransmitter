@@ -89,3 +89,26 @@ Future<void> updateSingleAnimeInSharedPreferences(
 
   await prefs.setString('animeData', updatedJsonString);
 }
+
+Future<Map<Weekday, List<Anime>>?> handleAnimeStorageAvailability(
+    String? animeDataString, String storageKeyAnimeData, prefs) async {
+  Map<Weekday, List<Anime>>? animeData;
+
+  if (animeDataString != null) {
+    final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
+    animeData = Map<Weekday, List<Anime>>.from(jsonMap.map(
+      (key, value) => MapEntry(WeekdayExtension.fromString(key),
+          (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
+    ));
+    animeData = sortAnimeByCurrentWeekday(animeData);
+    await saveAnimeDataToSharedPreferences(
+        animeData, prefs, storageKeyAnimeData);
+  } else {
+    animeData = await fetchAndGroupAnimeByWeekday();
+    animeData = sortAnimeByCurrentWeekday(animeData);
+    await saveAnimeDataToSharedPreferences(
+        animeData, prefs, storageKeyAnimeData);
+  }
+
+  return animeData;
+}

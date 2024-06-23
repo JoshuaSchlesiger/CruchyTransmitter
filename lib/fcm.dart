@@ -13,12 +13,13 @@ class FCM {
     firebaseMessaging.requestPermission();
 
     firebaseMessaging.getToken().then((token) {
-      saveTokenToSharedPreferences(token!);
+      handleToken(token!);
     });
   }
 
-  static void saveTokenToSharedPreferences(String token) async {
+  static void handleToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
 
     String? savedToken = prefs.getString('token');
 
