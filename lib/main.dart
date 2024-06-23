@@ -8,9 +8,11 @@ import 'package:crunchy_transmitter/settings_page.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:week_number/iso.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,7 +77,13 @@ class _MyHomePageState extends State<MyHomePage> {
         DateTime now = DateTime.now();
         int differenceInDays = now.difference(dateTimeUpdate).inDays;
 
-        if (differenceInDays >= 1) {
+        if (now.weekNumber != dateTimeUpdate.weekNumber) {
+          await prefs.setInt(
+              _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
+
+          prefs.remove(_storageKeyAnimeData);
+
+        } else if (differenceInDays >= 1) {
           await prefs.setInt(
               _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
 
