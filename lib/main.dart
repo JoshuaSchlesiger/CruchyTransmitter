@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _isLoading = true;
-  Map<int, bool> _isLoadingMap = {};
+  final Map<int, bool> _isLoadingMap = {};
 
   @override
   void initState() {
@@ -369,7 +369,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _showCustomMenu(details.globalPosition, anime.crunchyrollUrl);
         },
         child: Center(
-          child: _isLoadingMap[anime.animeId]!
+          child: _isLoadingMap[anime.animeId] != null && _isLoadingMap[anime.animeId]!
               ? SizedBox(
                   height: imageHeight,
                   width: imageWidth,
