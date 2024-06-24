@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import de.milschschnitte.crunchytransmitter.ConfigLoader;
 import de.milschschnitte.crunchytransmitter.fcm.NotificationService;
 import de.milschschnitte.crunchytransmitter.reciever.Anime;
+import de.milschschnitte.crunchytransmitter.reciever.EnumWeekdays;
 import de.milschschnitte.crunchytransmitter.reciever.Episode;
 
 import java.sql.Connection;
@@ -105,7 +106,7 @@ public class DatabaseManager {
     }
 
     public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException {
-        String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ? AND dateofweekday >= DATE_TRUNC('week', CURRENT_DATE)";
+        String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ?";
         String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ? WHERE id = ?";
         String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
@@ -122,8 +123,11 @@ public class DatabaseManager {
                     Date existingDateOfWeekday = resultSet.getDate("dateOfWeekday");
                     Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
 
-                    boolean needsUpdate = false;
+                    if(!EnumWeekdays.isInCurrentWeek(existingDateOfWeekday)){
+                        return -1;
+                    }
 
+                    boolean needsUpdate = false;
                     if (!existingReleaseTime.equals(episode.getReleaseTime())) {
                         needsUpdate = true;
                     }
