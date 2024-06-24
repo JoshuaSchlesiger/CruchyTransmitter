@@ -1,6 +1,8 @@
 package de.milschschnitte.crunchytransmitter.reciever;
 
 import java.time.DayOfWeek;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +32,7 @@ public enum EnumWeekdays {
         if (germanName.startsWith("\"") && germanName.endsWith("\"")) {
             germanName = germanName.substring(1, germanName.length() - 1);
         }
-        
+
         for (EnumWeekdays day : values()) {
             if (day.getGermanName().equalsIgnoreCase(germanName)) {
                 return day;
@@ -59,5 +61,17 @@ public enum EnumWeekdays {
                 logger.warn("Unknown weekday: " + enumWeekday);
                 throw new RuntimeException();
         }
+    }
+
+    public static boolean isInCurrentWeek(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+
+        Calendar today = Calendar.getInstance();
+        int currentYear = today.get(Calendar.YEAR);
+        int currentWeekOfYear = today.get(Calendar.WEEK_OF_YEAR);
+
+        return calendar.get(Calendar.YEAR) == currentYear && currentWeek == currentWeekOfYear;
     }
 }

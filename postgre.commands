@@ -19,7 +19,7 @@ CREATE TABLE episodes (
     id SERIAL PRIMARY KEY,
     anime_id INT NOT NULL,
     episode VARCHAR(255) NOT NULL,
-    releaseTime TIMESTAMP NOT NULL,
+    releaseTime TIMESTAMP,
     dateOfWeekday DATE NOT NULL,
     dateOfCorrectionDate DATE,
     sendedPushToUser BOOLEAN NOT NULL,

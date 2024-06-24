@@ -38,7 +38,7 @@ public class Episode {
     }
 
     public void setReleaseTime(String releaseTime){
-        if(releaseTime.equals("")){
+        if(releaseTime.equals("") || releaseTime.equals("TBA")){
             return;
         }
         
