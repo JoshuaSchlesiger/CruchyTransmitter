@@ -327,6 +327,26 @@ public class DatabaseManager {
         }
     }
 
+    public static void deleteToken(String token) {
+        String deleteQuery = "DELETE FROM tokens WHERE token = ?";
+    
+        try (Connection connection = getConnection();
+             PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+    
+            deleteStatement.setString(1, token);
+            int rowsDeleted = deleteStatement.executeUpdate();
+    
+            if (rowsDeleted > 0) {
+                logger.info("Token deleted successfully: " + token);
+            } else {
+                logger.warn("Token not found for deletion: " + token);
+            }
+    
+        } catch (SQLException e) {
+            logger.error("Error while deleting token", e);
+        }
+    }
+
     public static List<String> getAllTokensForAnime(Integer animeId) {
         List<String> tokens = new ArrayList<>();
         String selectQuery = "SELECT t.token " +

@@ -22,20 +22,22 @@ public class NotificationService {
     public static void sendNotificationInBlocks(String notificationTitle, String body, Integer animeId) {
         List<String> tokens = DatabaseManager.getAllTokensForAnime(animeId);
         int blockSize = 500;
+    
+        Integer successfully = 0;
 
         for (int i = 0; i < tokens.size(); i += blockSize) {
             List<String> blockTokens = tokens.subList(i, Math.min(i + blockSize, tokens.size()));
 
-            sendNotificationBlock(notificationTitle, body, blockTokens);
+            successfully += sendNotificationBlock(notificationTitle, body, blockTokens);
         }
 
-        logger.info("Sended all notification to users");
+        logger.info("Sended all notification to users. Sended " + successfully + " successfully");
     }
 
-    private static void sendNotificationBlock(String notificationTitle, String body, List<String> tokens) {
+    private static Integer sendNotificationBlock(String notificationTitle, String body, List<String> blockTokens) {
         List<Message> messages = new ArrayList<>();
 
-        for (String token : tokens) {
+        for (String token : blockTokens) {
             Message message = Message.builder()
                     .setNotification(Notification.builder().setTitle(notificationTitle).setBody(body).build())
                     .setToken(token)
@@ -43,18 +45,21 @@ public class NotificationService {
             messages.add(message);
         }
 
+        int successfully = 0;
+
         try {
             BatchResponse response = FirebaseMessaging.getInstance().sendEach(messages);
             for (int i = 0; i < response.getResponses().size(); i++) {
                 SendResponse sendResponse = response.getResponses().get(i);
                 if (sendResponse.isSuccessful()) {
-                    logger.info("Notification batch " + i + " sent successfully");
+                    successfully++;
                 } else {
-                    logger.error("Failed to send notification batch " + i + ": " + sendResponse.getException());
+                    DatabaseManager.deleteToken(blockTokens.get(i));
                 }
             }
         } catch (FirebaseMessagingException e) {
             logger.error("Error while sending notification batch: " + e.getMessage());
         }
+        return successfully;
     }
 }
