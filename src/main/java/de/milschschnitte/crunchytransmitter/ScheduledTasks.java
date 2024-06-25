@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -21,7 +21,7 @@ import de.milschschnitte.crunchytransmitter.reciever.JsonEpisodeFetcher;
  */
 @Component
 public class ScheduledTasks {
-    static Logger logger = LogManager.getLogger(ScheduledTasks.class);
+    static Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
 
     public static String json = "";
 

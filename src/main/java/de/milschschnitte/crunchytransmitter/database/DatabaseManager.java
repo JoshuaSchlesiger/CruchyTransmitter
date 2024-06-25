@@ -14,8 +14,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.milschschnitte.crunchytransmitter.ConfigLoader;
 import de.milschschnitte.crunchytransmitter.fcm.NotificationService;
@@ -27,7 +27,7 @@ import java.sql.Connection;
 import java.sql.Date;
 
 public class DatabaseManager {
-    static Logger logger = LogManager.getLogger(DatabaseManager.class);
+    static Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 
     private static Connection getConnection() throws SQLException {
         Connection connection = DriverManager.getConnection(ConfigLoader.getProperty("spring.datasource.url"),
@@ -239,7 +239,7 @@ public class DatabaseManager {
             if (rowsUpdated > 0) {
                 logger.info("Marked episode as pushed (episodeID): " + episodeID);
             } else {
-                logger.fatal("Cannot find episode with id: " + episodeID);
+                logger.error("Cannot find episode with id: " + episodeID);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -299,7 +299,7 @@ public class DatabaseManager {
                             Anime anime = new Anime(episode, animeId, title, imageUrl, crunchyrollUrl);
                             animeList.add(anime);
                         } else {
-                            logger.fatal("Can not find anime with id: " + animeId);
+                            logger.error("Can not find anime with id: " + animeId);
                         }
                     }
                 }

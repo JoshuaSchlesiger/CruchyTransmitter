@@ -3,18 +3,18 @@ package de.milschschnitte.crunchytransmitter.reciever;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
  */
 public class AnimeInfoExtractor {
-    static Logger logger = LogManager.getLogger(AnimeInfoExtractor.class);
+    static Logger logger = LoggerFactory.getLogger(AnimeInfoExtractor.class);
 
     public static List<Anime> extractAnime(String html, EnumWeekdays weekday) {
         // Parse the HTML content

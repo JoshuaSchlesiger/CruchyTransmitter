@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 public class BaseDataController {
 
-    Logger logger = LogManager.getLogger(BaseDataController.class);
+    private Logger logger = LoggerFactory.getLogger(BaseDataController.class);
     private final Map<String, Bucket> buckets;
 
     public BaseDataController() {

@@ -12,12 +12,12 @@ import de.milschschnitte.crunchytransmitter.database.DatabaseManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NotificationService {
 
-    static Logger logger = LogManager.getLogger(NotificationService.class);
+    static Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     /*
      * Google fcm allows you to send in blocks, but only with a maximum of 500 elements per block

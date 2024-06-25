@@ -5,8 +5,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +23,7 @@ import java.util.List;
  * Class for extracting the information from the json provided by the Crunchyroll website
  */
 public class JsonEpisodeFetcher {
-    private Logger logger = LogManager.getLogger(JsonEpisodeFetcher.class);
+    private Logger logger = LoggerFactory.getLogger(JsonEpisodeFetcher.class);
     private List<Anime> animeList = new ArrayList<Anime>();
     
     /**
@@ -50,7 +50,7 @@ public class JsonEpisodeFetcher {
         }
 
         if(animeList.size() == 0){
-            logger.fatal("Did not find any animes after process");
+            logger.error("Did not find any animes after process");
         }
         
         return animeList;
@@ -113,7 +113,7 @@ public class JsonEpisodeFetcher {
                 }
             }
         } else {
-          logger.fatal("Major problem at processing json of crunchyroll");                  
+          logger.error("Major problem at processing json of crunchyroll");                  
         }
     }
 }

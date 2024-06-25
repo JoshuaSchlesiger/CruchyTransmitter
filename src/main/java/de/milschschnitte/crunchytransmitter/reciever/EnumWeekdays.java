@@ -4,8 +4,9 @@ import java.time.DayOfWeek;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public enum EnumWeekdays {
     MONDAY("Montag"),
@@ -17,7 +18,7 @@ public enum EnumWeekdays {
     SUNDAY("Sonntag");
 
     private final String germanName;
-    static Logger logger = LogManager.getLogger(EnumWeekdays.class);
+    static Logger logger = LoggerFactory.getLogger(EnumWeekdays.class);
 
     EnumWeekdays(String germanName) {
         this.germanName = germanName;
