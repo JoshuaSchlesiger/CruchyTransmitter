@@ -28,7 +28,6 @@ public enum EnumWeekdays {
     }
 
     public static EnumWeekdays fromGermanName(String germanName) {
-        // Entfernen der zusätzlichen Anführungszeichen, falls vorhanden
         if (germanName.startsWith("\"") && germanName.endsWith("\"")) {
             germanName = germanName.substring(1, germanName.length() - 1);
         }

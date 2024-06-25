@@ -50,16 +50,21 @@ public class JsonEpisodeFetcher {
                             for (int i = 1; i < bodyNode.size(); i++) {
                                 JsonNode elementNode = bodyNode.get(i);
 
-                                //Check weekdays, continue until monday is not found
+                                //Check weekdays, continue until monday is found
                                 try {
                                     JsonNode weekdayNode = elementNode.get("content").get("content").get(0).get("content").get(0).get("text");
+                                    //Filter end of sunday
+                                    if(weekdayNode.asText().equals("Katalogtitel")){
+                                        break;
+                                    }
+
                                     weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
+                                    //Filter everything until monday
                                     if (weekday == null) continue;
                                     if (weekday == EnumWeekdays.MONDAY) mondayFound = true;
 
                                     continue;
                                 } catch (NullPointerException e) {
-                                    // System.out.println("skip weekday");
                                 }
                                 if(mondayFound == false) continue;
 
