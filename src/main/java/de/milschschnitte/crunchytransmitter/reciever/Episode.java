@@ -38,6 +38,7 @@ public class Episode {
     }
 
     public void setReleaseTime(String releaseTime){
+        //TBA equals to be announced
         if(releaseTime.equals("") || releaseTime.equals("TBA")){
             return;
         }

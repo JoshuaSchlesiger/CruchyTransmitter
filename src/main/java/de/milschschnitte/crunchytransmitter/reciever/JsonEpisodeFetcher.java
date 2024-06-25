@@ -11,84 +11,35 @@ import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.milschschnitte.crunchytransmitter.ConfigLoader;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class for extracting the information from the json provided by the Crunchyroll website
+ */
 public class JsonEpisodeFetcher {
-
-    Logger logger = LogManager.getLogger(JsonEpisodeFetcher.class);
-
-    public List<Anime> fetch(String seasonURL) {
-        List<Anime> animeList = new ArrayList<Anime>();
+    private Logger logger = LogManager.getLogger(JsonEpisodeFetcher.class);
+    private List<Anime> animeList = new ArrayList<Anime>();
+    
+    /**
+     * 
+     * @param seasonURL
+     * @return List<Anime> animeList
+     */
+    public List<Anime> fetchAndProcess() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet request = new HttpGet(seasonURL);
+            HttpGet request = new HttpGet(ConfigLoader.getProperty("crunchyroll.seasonURL"));
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode == 200) {
                     HttpEntity entity = response.getEntity();
                     if (entity != null) {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent()));
-                        StringBuilder result = new StringBuilder();
-
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            result.append(line);
-                        }
-
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        JsonNode rootNode = objectMapper.readTree(result.toString());
-
-                        JsonNode bodyNode = rootNode.get("story").get("content").get("body");
-
-                        if (bodyNode.isArray()) {
-                            EnumWeekdays weekday = null;
-
-                            Boolean mondayFound = false;
-
-                            for (int i = 1; i < bodyNode.size(); i++) {
-                                JsonNode elementNode = bodyNode.get(i);
-
-                                //Check weekdays, continue until monday is found
-                                try {
-                                    JsonNode weekdayNode = elementNode.get("content").get("content").get(0).get("content").get(0).get("text");
-                                    //Filter end of sunday
-                                    if(weekdayNode.asText().equals("Katalogtitel")){
-                                        break;
-                                    }
-
-                                    weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
-                                    //Filter everything until monday
-                                    if (weekday == null) continue;
-                                    if (weekday == EnumWeekdays.MONDAY) mondayFound = true;
-
-                                    continue;
-                                } catch (NullPointerException e) {
-                                }
-                                if(mondayFound == false) continue;
-
-                                try {
-                                    JsonNode animeEpisodeNode = elementNode.get("items");
-                                    for (JsonNode animeEpisode : animeEpisodeNode) {
-                                        String animeHTML = animeEpisode.get("table").get("content").toString();
-                                        animeList.addAll(AnimeInfoExtractor.extractAnime(animeHTML, weekday));
-                                    }
-                                    continue;
-                                } catch (NullPointerException e) {
-                                    // System.out.println("skip animeEpisode");
-                                }
-
-                                try {
-                                    // JsonNode horizontalLineNode = elementNode.get("content").get("content").get(0).get("type");
-                                    continue;
-                                } catch (NullPointerException e) {
-                                    // System.out.println("skip horizontal");
-                                }  
-                            }
-                        } else {
-                            
-                        }
+                        processEntity(entity);
                     }
                 } else {
                     logger.warn("Error on Crunchyroll-Serveraccess: " + statusCode);
@@ -103,5 +54,66 @@ public class JsonEpisodeFetcher {
         }
         
         return animeList;
+    }
+
+    private void processEntity(HttpEntity entity) throws UnsupportedOperationException, IOException{
+        BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent()));
+        StringBuilder result = new StringBuilder();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            result.append(line);
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        //Main json
+        JsonNode rootNode = objectMapper.readTree(result.toString());
+        //Body of JSON
+        JsonNode bodyNode = rootNode.get("story").get("content").get("body");
+        if (bodyNode.isArray()) {
+            //Storing current weekday for processing
+            EnumWeekdays weekday = null;
+
+            //Used to skip ever element util monday is there
+            Boolean mondayFound = false;
+
+            //Idk why i star with 1, maybe 0 is possible too ?
+            for (int i = 1; i < bodyNode.size(); i++) {
+                JsonNode elementNode = bodyNode.get(i);
+
+                //Check weekdays, continue until monday is found
+                try {
+                    JsonNode weekdayNode = elementNode.get("content").get("content").get(0).get("content").get(0).get("text");
+                    //Filter end of sunday
+                    if(weekdayNode.asText().equals("Katalogtitel")){
+                        break;
+                    }
+
+                    weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
+                    //Filter everything until monday
+                    if (weekday == null) continue;
+                    if (weekday == EnumWeekdays.MONDAY) mondayFound = true;
+
+                    continue;
+                } catch (NullPointerException e) {
+                }
+
+                if(mondayFound == false) continue;
+
+                try {
+                    JsonNode animeEpisodeNode = elementNode.get("items");
+                    for (JsonNode animeEpisode : animeEpisodeNode) {
+                        String animeHTML = animeEpisode.get("table").get("content").toString();
+
+                        //Mainprocess to process html inside of json element. Result is used to put inside of db
+                        animeList.addAll(AnimeInfoExtractor.extractAnime(animeHTML, weekday));
+                    }
+                    continue;
+                } catch (NullPointerException e) {
+                }
+            }
+        } else {
+          logger.fatal("Major problem at processing json of crunchyroll");                  
+        }
     }
 }

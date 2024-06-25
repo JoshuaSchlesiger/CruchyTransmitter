@@ -1,5 +1,8 @@
 package de.milschschnitte.crunchytransmitter.restAPI;
 
+/**
+ * PostRequest class for posting to fcm-token by the client
+ */
 public class FCMTokenPostRequest {
     private String password;
     private String token;

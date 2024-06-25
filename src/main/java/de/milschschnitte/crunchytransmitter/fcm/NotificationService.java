@@ -19,6 +19,9 @@ public class NotificationService {
 
     static Logger logger = LogManager.getLogger(NotificationService.class);
 
+    /*
+     * Google fcm allows you to send in blocks, but only with a maximum of 500 elements per block
+     */
     public static void sendNotificationInBlocks(String notificationTitle, String body, Integer animeId) {
         List<String> tokens = DatabaseManager.getAllTokensForAnime(animeId);
         int blockSize = 500;
@@ -31,13 +34,14 @@ public class NotificationService {
             successfully += sendNotificationBlock(notificationTitle, body, blockTokens);
         }
 
-        logger.info("Sended all notification to users. Sended " + successfully + " successfully");
+        logger.warn("Sended all notification to users. Sended " + successfully + " successfully");
     }
 
     private static Integer sendNotificationBlock(String notificationTitle, String body, List<String> blockTokens) {
         List<Message> messages = new ArrayList<>();
 
         for (String token : blockTokens) {
+            //Bulding message for user notific.
             Message message = Message.builder()
                     .setNotification(Notification.builder().setTitle(notificationTitle).setBody(body).build())
                     .setToken(token)
@@ -54,6 +58,7 @@ public class NotificationService {
                 if (sendResponse.isSuccessful()) {
                     successfully++;
                 } else {
+                    // I want to save storage so i delete old tokens that will not longer work
                     DatabaseManager.deleteToken(blockTokens.get(i));
                 }
             }

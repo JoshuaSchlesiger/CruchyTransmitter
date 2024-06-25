@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 
 import de.milschschnitte.crunchytransmitter.ConfigLoader;
 import de.milschschnitte.crunchytransmitter.fcm.NotificationService;
@@ -105,6 +103,11 @@ public class DatabaseManager {
     }
 
     public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException {
+        // Catching empty episodeTitle
+        if (episode.getEpisode() == null ) {
+            return -1;
+        }
+
         String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ?";
         String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ? WHERE id = ?";
         String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
@@ -122,7 +125,7 @@ public class DatabaseManager {
                     Date existingDateOfWeekday = resultSet.getDate("dateOfWeekday");
                     Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
 
-                    if(!EnumWeekdays.isInCurrentWeek(existingDateOfWeekday)){
+                    if (!EnumWeekdays.isInCurrentWeek(existingDateOfWeekday)) {
                         return -1;
                     }
 
@@ -253,9 +256,9 @@ public class DatabaseManager {
         // Go forward to get Sunday
         LocalDate sunday = today;
         LocalDateTime endOfSunday = null;
-        if(sunday.getDayOfWeek() == DayOfWeek.SUNDAY){
+        if (sunday.getDayOfWeek() == DayOfWeek.SUNDAY) {
             endOfSunday = sunday.atTime(LocalTime.MAX);
-        }else{
+        } else {
             while (sunday.getDayOfWeek() != DayOfWeek.SUNDAY) {
                 sunday = sunday.plusDays(1);
                 endOfSunday = sunday.atTime(LocalTime.MAX);
@@ -291,7 +294,7 @@ public class DatabaseManager {
                             String title = animeResultSet.getString("title");
                             String imageUrl = animeResultSet.getString("imageurl");
                             String crunchyrollUrl = animeResultSet.getString("crunchyrollUrl");
-        
+
                             Anime anime = new Anime(episode, animeId, title, imageUrl, crunchyrollUrl);
                             animeList.add(anime);
                         } else {
@@ -329,19 +332,19 @@ public class DatabaseManager {
 
     public static void deleteToken(String token) {
         String deleteQuery = "DELETE FROM tokens WHERE token = ?";
-    
+
         try (Connection connection = getConnection();
-             PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
-    
+                PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+
             deleteStatement.setString(1, token);
             int rowsDeleted = deleteStatement.executeUpdate();
-    
+
             if (rowsDeleted > 0) {
                 logger.info("Token deleted successfully: " + token);
             } else {
                 logger.warn("Token not found for deletion: " + token);
             }
-    
+
         } catch (SQLException e) {
             logger.error("Error while deleting token", e);
         }

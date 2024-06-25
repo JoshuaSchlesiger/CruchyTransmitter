@@ -15,6 +15,11 @@ import java.io.InputStream;
 @Configuration
 public class FirebaseConfig {
 
+    /**
+     * Init FirebaseApp (google)
+     * @return
+     * @throws IOException
+     */
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
         Resource resource = new ClassPathResource("crunchy-transmitter-firebase-adminsdk-fondb-7cc6dde6c0.json");

@@ -11,6 +11,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class App {
 
+    /**
+     * Main function
+     * @param args
+     * @throws ConfigurationException If the application.properties is missing
+     */
     public static void main(String[] args) throws ConfigurationException {
 
         SpringApplication.run(App.class, args);

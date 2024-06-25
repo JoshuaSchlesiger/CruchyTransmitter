@@ -10,10 +10,10 @@ crunchyroll.seasonURL = https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de
 spring.api.key = string
 
 spring.api.token.refill = 1
-spring.api.token.storage = 1
+spring.api.token.storage = 4
 
-spring.api.animeget.refill = 50
-spring.api.animeget.storage = 250
+spring.api.animeget.refill = 1
+spring.api.animeget.storage = 50
 
 spring.api.animesub.refill = 120
 spring.api.animesub.storage = 120

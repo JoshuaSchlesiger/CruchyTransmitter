@@ -1,5 +1,8 @@
 package de.milschschnitte.crunchytransmitter.restAPI;
 
+/**
+ * PostRequest class for subscribing to anime by the client
+ */
 public class AnimeSubPostRequest {
     private String password;
     private String animeID;

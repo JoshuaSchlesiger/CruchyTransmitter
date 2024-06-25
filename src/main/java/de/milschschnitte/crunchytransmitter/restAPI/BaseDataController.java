@@ -21,6 +21,9 @@ import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Class of routes 
+ */
 @RestController
 public class BaseDataController {
 

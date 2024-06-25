@@ -6,6 +6,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 
+/**
+ * Class to get properties out of the application.properties
+ */
 @Component
 @PropertySource("classpath:application.properties")
 public class ConfigLoader {
