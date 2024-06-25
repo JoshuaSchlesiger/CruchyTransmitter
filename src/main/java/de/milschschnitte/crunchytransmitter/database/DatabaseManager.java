@@ -130,9 +130,10 @@ public class DatabaseManager {
                     }
 
                     boolean needsUpdate = false;
-                    if (!existingReleaseTime.equals(episode.getReleaseTime())) {
+                    if ((episode.getReleaseTime() != null && existingReleaseTime == null) || (episode.getReleaseTime() != null && !episode.getReleaseTime().equals(existingReleaseTime))) {
                         needsUpdate = true;
                     }
+
                     if (!existingDateOfWeekday.equals(episode.getDateOfWeekday())) {
                         needsUpdate = true;
                     }
