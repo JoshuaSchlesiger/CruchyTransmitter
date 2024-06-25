@@ -11,7 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ * Class to extract the content on the HTML elements of the JSON
+ * It works somehow I don't know why ^^
  */
 public class AnimeInfoExtractor {
     static Logger logger = LoggerFactory.getLogger(AnimeInfoExtractor.class);
@@ -120,7 +121,7 @@ public class AnimeInfoExtractor {
                     }
                 }
             } else {
-                // System.out.println("No td elements found in this tr.");
+                logger.warn("No td elements found in this tr. This is not good");
             }
         }
         return animeList;
