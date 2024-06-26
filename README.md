@@ -1,6 +1,7 @@
 
 # CrunchyTransmitter 
-Welcome to me the CrunchyTransmitter
+Welcome to me the CrunchyTransmitter.
+First of all, if you only want to use the app, just click [here](https://play.google.com/store/games?hl=en) to **install**. 
 
 ## Why do I exist?!?
 I came about because my mom Crunchyroll simply had no means of notification when one of her children was born (episodes released). My master, the MilschSchnitte, always wanted to watch the latest episodes in the evening and be notified when one came out. Also, mom's website takes so long to load because of this stupid JavaScript.... 
@@ -35,6 +36,19 @@ The server was created using the **Spring** framework and has 3 **automated task
 In addition, the server should provide **1 get-interface (/anime)** where clients can download the week's data.
 In addition, **2 post-interfaces** are required for the notification system. The first interface (**/registerToken**) is required so that clients can register their FCM token with my server and then use the second interface (**/updateAnimeSub**) to manage their subscriptions. 
 
+
+## Deployment on own server
+
+### Requirements
+* Java version: 20.0.2
+* Maven version 3.9.6
+* Tomcat version 10.1.24
+* Postgres version 15.6
+
+### Database preparation 
+
+I use a Postgres database. I have written a file in the project path which gives you the commands to create your database correctly. The file is called postgre.commands
+
 ### Properties
 
 The server offers a configuration option using properties. Copy the application.properties_example to application.properties. I will now explain the individual properties:
@@ -57,17 +71,6 @@ The server offers a configuration option using properties. Copy the application.
 
 * **spring.api.animesub.refill** <- Recharge of the number of opportunities per minute at which a client can change their subscriptions
 * **spring.api.animesub.storage** <- Number of options for using the interface
-## Deployment
-
-### Requirements
-* Java version: 20.0.2
-* Maven version 3.9.6
-* Tomcat version 10.1.24
-* Postgres version 15.6
-
-### Database preparation 
-
-I use a Postgres database. I have written a file in the project path which gives you the commands to create your database correctly. The file is called postgre.commands
 
 ### Instructions to deploy
 
