@@ -63,6 +63,11 @@ The server offers a configuration option using properties. Copy the application.
 * Java version: 20.0.2
 * Maven version 3.9.6
 * Tomcat version 10.1.24
+* Postgres version 15.6
+
+### Database preparation 
+
+I use a Postgres database. I have written a file in the project path which gives you the commands to create your database correctly. The file is called postgre.commands
 
 ### Instructions to deploy
 
