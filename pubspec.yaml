@@ -1,5 +1,5 @@
 name: crunchy_transmitter
-description: "A new Flutter project."
+description: "App to receive episode data and notifications of releases"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
