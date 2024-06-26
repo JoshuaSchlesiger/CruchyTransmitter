@@ -60,14 +60,29 @@ The server offers a configuration option using properties. Copy the application.
 ## Deployment
 
 ### Requirements
+* Java version: 20.0.2
+* Maven version 3.9.6
+* Tomcat version 10.1.24
 
-To deploy this project run
+### Instructions to deploy
+
+First of all, you should know that the project is currently running with Google FCM. 
+
+To create your own server you need a project at [Google FCM](https://firebase.google.com/). From there you will also get the 2 files for your server and the app. The server file, which in my case is called: crunchy-transmitter-firebase-adminsdk-fondb-7cc6dde6c0.json, must be placed in the "resources" folder. Then change the name in the java file under src\main\java\de\milschschnitte\crunchytransmitter\fcm\FirebaseConfig.java.
+
+The next step is to create the properties file as described above under Properties. The server should now be able to be started as .war using Tomcat.
+
+You can use the following commands for this:
+
+In your project just write:
 
 ```bash
-  npm run deploy
+  mvn clean install
+  cd target/
+  cp CrunchyTransmitter-1.0.war /opt/tomcat/webapps/
 ```
 
-
+To ensure that **your own server** is also controlled in your app, please take a look at the readme of the branch : flutter_project
 ## License
 
 This project is licensed under [apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
