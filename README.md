@@ -18,7 +18,7 @@ I welcome any constructive suggestions for the project and will be happy to deve
 
 Since I privately pay for the server costs and the publishing on Google, I would be happy about a little support.
 
-[![PayPal](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png)](https://www.paypal.com)
+[![PayPal](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png)](https://www.paypal.com/paypalme/JoshuaSchlesiger?country.x=DE&locale.x=de_DE)
 
 
 
