@@ -22,7 +22,7 @@ public class NotificationService {
     /*
      * Google fcm allows you to send in blocks, but only with a maximum of 500 elements per block
      */
-    public static void sendNotificationInBlocks(String notificationTitle, String body, Integer animeId) {
+    public static void sendNotificationInBlocks(String notificationTitle, String body, String url, Integer animeId) {
         List<String> tokens = DatabaseManager.getAllTokensForAnime(animeId);
         int blockSize = 500;
     
@@ -31,13 +31,13 @@ public class NotificationService {
         for (int i = 0; i < tokens.size(); i += blockSize) {
             List<String> blockTokens = tokens.subList(i, Math.min(i + blockSize, tokens.size()));
 
-            successfully += sendNotificationBlock(notificationTitle, body, blockTokens);
+            successfully += sendNotificationBlock(notificationTitle, body, url, blockTokens);
         }
 
         logger.warn("Sended all notification to users. Sended " + successfully + " successfully");
     }
 
-    private static Integer sendNotificationBlock(String notificationTitle, String body, List<String> blockTokens) {
+    private static Integer sendNotificationBlock(String notificationTitle, String body, String url ,List<String> blockTokens) {
         List<Message> messages = new ArrayList<>();
 
         for (String token : blockTokens) {
@@ -45,6 +45,7 @@ public class NotificationService {
             Message message = Message.builder()
                     .setNotification(Notification.builder().setTitle(notificationTitle).setBody(body).build())
                     .setToken(token)
+                    .putData("url", url)
                     .build();
             messages.add(message);
         }

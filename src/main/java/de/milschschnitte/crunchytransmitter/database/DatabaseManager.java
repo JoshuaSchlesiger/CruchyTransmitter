@@ -160,7 +160,7 @@ public class DatabaseManager {
 
                             String formattedReleaseTime = dateFormat.format(episode.getReleaseTime());
                             NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
-                                    anime.getTitle() + " - " + episode.getEpisode() + " - " + formattedReleaseTime,
+                                    anime.getTitle() + " - " + episode.getEpisode() + " - " + formattedReleaseTime, anime.getCrunchyrollUrl(),
                                     animeId);
 
                         }
