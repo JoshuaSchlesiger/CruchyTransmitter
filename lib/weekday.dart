@@ -8,6 +8,7 @@ enum Weekday {
   sunday,
 }
 
+/// Enum for german weekdays
 extension WeekdayExtension on Weekday {
   static Weekday fromGerman(String german) {
     switch (german.toLowerCase()) {

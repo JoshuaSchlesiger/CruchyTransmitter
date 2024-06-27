@@ -1,5 +1,5 @@
 import 'package:crunchy_transmitter/anime/anime.dart';
-import 'package:crunchy_transmitter/config.dart';
+import 'package:crunchy_transmitter/config/config.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
@@ -8,8 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FCM {
 
+  ///if an error occurs when getting or posting the subscription, this varriable is the memory for outside
   static String responseMessage = "";
 
+  ///initialisation for google FCM, after which the token is saved and then sent to the server
   static void instanceProcess() {
     final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
@@ -20,6 +22,8 @@ class FCM {
     });
   }
 
+  ///Store token and send if not stored already or different
+  ///when a new token is generated, the old subscriptions are sent to the server
   static void handleToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 

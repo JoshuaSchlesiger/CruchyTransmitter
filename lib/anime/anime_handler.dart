@@ -1,5 +1,5 @@
 import 'package:crunchy_transmitter/anime/anime.dart';
-import 'package:crunchy_transmitter/config.dart';
+import 'package:crunchy_transmitter/config/config.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
