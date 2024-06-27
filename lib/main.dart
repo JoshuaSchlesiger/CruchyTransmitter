@@ -13,6 +13,8 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:week_number/iso.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -65,6 +67,24 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     FCM.instanceProcess();
 
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+      if (message.notification != null) {
+        String? url = message.data['url'];
+        if (url != null && url.isNotEmpty) {
+          await launchUrl(Uri.parse(url));
+        }
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      if (message.notification != null) {
+        String? url = message.data['url'];
+        if (url != null && url.isNotEmpty) {
+          await launchUrl(Uri.parse(url));
+        }
+      }
+    });
+
     _prefs.then((prefs) async {
       final DateTime? dateTimeUpdate =
           await loadSavedTime(_storageKeyDateTimeUpdate, prefs);
@@ -76,7 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
         DateTime now = DateTime.now();
         int differenceInDays = now.difference(dateTimeUpdate).inDays;
 
-        if (differenceInDays >= 1 || now.weekNumber != dateTimeUpdate.weekNumber) {
+        if (differenceInDays >= 1 ||
+            now.weekNumber != dateTimeUpdate.weekNumber) {
           await prefs.setInt(
               _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
 
@@ -168,21 +189,21 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.settings,
-              color: Color.fromARGB(155, 255, 255, 255),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SettingsPage(
-                          title: widget.title,
-                        )),
-              );
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(
+          //     Icons.settings,
+          //     color: Color.fromARGB(155, 255, 255, 255),
+          //   ),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //           builder: (context) => SettingsPage(
+          //                 title: widget.title,
+          //               )),
+          //     );
+          //   },
+          // ),
         ],
       ),
       body: _isLoading
@@ -384,9 +405,9 @@ class _MyHomePageState extends State<MyHomePage> {
               // ignore: use_build_context_synchronously
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Fehler Yoshi'),
-                content: const Text(
-                    'Ich war wohl etwas schlampig. PS. Probiere es nochmal . PPS. Vielleicht Server überlastet?!'),
+                title: const Text('Fehler'),
+                content: Text(
+                    'Es gab einen Fehler. Versuche es vielleicht in 5 Minuten nochmal. Fehlernachricht: ${FCM.responseMessage}'),
                 actions: <Widget>[
                   TextButton(
                     child: const Text('OK'),

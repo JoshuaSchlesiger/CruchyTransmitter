@@ -7,6 +7,9 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FCM {
+
+  static String responseMessage = "";
+
   static void instanceProcess() {
     final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
@@ -66,14 +69,11 @@ class FCM {
       body: body,
     )
         .then((response) {
-      // if (response.statusCode == 200) {
-      //   print('Token erfolgreich an Server gesendet');
-      // } else {
-      //   print(
-      //       'Fehler beim Senden des Tokens an den Server: ${response.statusCode}');
-      // }
+      if (response.statusCode != 200) {
+        responseMessage = response.statusCode.toString();
+      }
     }).catchError((error) {
-      // print('Fehler beim Senden des Tokens an den Server: $error');
+      responseMessage = error;
     });
   }
 
@@ -100,9 +100,11 @@ class FCM {
           return -1;
         }
       } else {
+         responseMessage = response.statusCode.toString();
         return -1;
       }
     } catch (error) {
+      responseMessage = error.toString();
       return -1;
     }
   }
