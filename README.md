@@ -1,6 +1,6 @@
 # CrunchyTransmitter - APP
 
-Welcome to the CrunchyTransmitter app
+Welcome to the CrunchyTransmitter app. First of all, if you only want to use the app, just click [here](https://play.google.com/store/games?gl=DE) to install.
 
 
 ### What is my job?
