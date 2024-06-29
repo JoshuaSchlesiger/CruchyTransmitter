@@ -113,7 +113,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                 color: Colors.white),
           ),
           const Padding(
-            padding: EdgeInsets.only(top:50, left: 10, right: 10, bottom: 40),
+            padding: EdgeInsets.only(top: 50, left: 10, right: 10, bottom: 40),
             child: Text(
               "Sobald du einen Anime auswählst, erhältst du Benachrichtigungen über neue Veröffentlichungen",
               textAlign: TextAlign.center,
@@ -142,15 +142,20 @@ class WelcomeScreenState extends State<WelcomeScreen> {
             ],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Image.asset(
-                          'assets/kaiju_grey.jpg'), // Bild in der linken Zelle
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Image.asset(
+                          'assets/kaiju_grey.jpg',
+                          // Hier können Sie die Breite und Höhe des Bildes festlegen, falls erforderlich
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -160,8 +165,13 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Image.asset(
-                          'assets/kaiju_full.jpg'), // Bild in der rechten Zelle
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Image.asset(
+                          'assets/kaiju_full.jpg',
+                          // Hier können Sie die Breite und Höhe des Bildes festlegen, falls erforderlich
+                        ),
+                      ),
                     ),
                   ],
                 ),
