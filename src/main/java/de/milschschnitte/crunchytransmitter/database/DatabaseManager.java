@@ -156,7 +156,7 @@ public class DatabaseManager {
 
                             Anime anime = getAnimeInformation(animeId);
 
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd");
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm");
 
                             String formattedReleaseTime = dateFormat.format(episode.getReleaseTime());
                             NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
