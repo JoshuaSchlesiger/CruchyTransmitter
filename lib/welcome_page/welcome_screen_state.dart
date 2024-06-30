@@ -1,6 +1,8 @@
 import 'package:crunchy_transmitter/welcome_page/welcome_screen.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeScreenState extends State<WelcomeScreen> {
   late PageController _pageController;
@@ -115,7 +117,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
           const Padding(
             padding: EdgeInsets.only(top: 50, left: 10, right: 10, bottom: 40),
             child: Text(
-              "Sobald du einen Anime auswählst, erhältst du Benachrichtigungen über neue Veröffentlichungen",
+              "Sobald du einen Anime anklickst, erhältst du Benachrichtigungen über neue Veröffentlichungen",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18.0, color: Colors.white),
             ),
@@ -153,7 +155,6 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                         alignment: Alignment.centerRight,
                         child: Image.asset(
                           'assets/kaiju_grey.jpg',
-                          // Hier können Sie die Breite und Höhe des Bildes festlegen, falls erforderlich
                         ),
                       ),
                     ),
@@ -169,7 +170,6 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                         alignment: Alignment.centerLeft,
                         child: Image.asset(
                           'assets/kaiju_full.jpg',
-                          // Hier können Sie die Breite und Höhe des Bildes festlegen, falls erforderlich
                         ),
                       ),
                     ),
@@ -185,25 +185,40 @@ class WelcomeScreenState extends State<WelcomeScreen> {
 
   Widget _buildPage2() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+      padding: const EdgeInsets.symmetric(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            "df",
-            style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20.0),
-          Text(
-            "df",
+          const Text(
+            "Einführungserklärung",
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 18.0),
+            style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
           ),
-          const SizedBox(height: 40.0),
-          Text(
-            'Seite  von 3',
-            style: const TextStyle(fontSize: 16.0, color: Colors.grey),
+          const Padding(
+            padding: EdgeInsets.only(top: 50, left: 10, right: 10, bottom: 40),
+            child: Text(
+              'Drücke lange auf einen Anime, dann erscheint ein „Anschauen“-Symbol, mit dem du direkt zu Crunchyroll gelangst.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18.0, color: Colors.white),
+            ),
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Image.asset(
+                  'assets/anschauen.png',
+                  width: 300,
+                  height: 300,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
@@ -211,25 +226,66 @@ class WelcomeScreenState extends State<WelcomeScreen> {
 
   Widget _buildPage3() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+      padding: const EdgeInsets.symmetric(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            "df",
-            style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20.0),
-          Text(
-            "df",
+          const Text(
+            "Einführungserklärung",
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 18.0),
+            style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
           ),
-          const SizedBox(height: 40.0),
-          Text(
-            'Seite  von 3',
-            style: const TextStyle(fontSize: 16.0, color: Colors.grey),
+          const Padding(
+            padding: EdgeInsets.only(top: 50, left: 10, right: 10, bottom: 40),
+            child: Text(
+              "Sobald du auf eine Benachrichtigung klickst, wirst du automatisch auf Crunchyroll weitergeleitet",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18.0, color: Colors.white),
+            ),
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 40, left: 10, right: 10, bottom: 210),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: const TextStyle(fontSize: 18.0, color: Colors.white),
+                          children: [
+                            const TextSpan(
+                              text: "Vielen Dank an ",
+                            ),
+                            TextSpan(
+                              text: "flaticon",
+                              style: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  launchUrl(Uri.parse("https://www.flaticon.com/"));
+                                },
+                            ),
+                            const TextSpan(
+                              text: " für die Bereitstellung der Bilder",
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

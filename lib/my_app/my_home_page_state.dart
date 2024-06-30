@@ -53,7 +53,7 @@ class MyHomePageState extends State<MyHomePage> {
       final DateTime? dateTimeUpdate =
           await loadSavedTime(_storageKeyDateTimeUpdate, prefs);
 
-      //if it's null, then it's okay and it will just set the current time, 
+      //if it's null, then it's okay and it will just set the current time,
       //but if not, then a fetch to the server must be made and all the subscribed anime will be loaded to the new anime from the get
       if (dateTimeUpdate == null) {
         await prefs.setInt(
@@ -143,6 +143,10 @@ class MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 33, 33, 33),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          child: Image.asset('assets/ic_launcher.png'),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -475,7 +479,7 @@ class MyHomePageState extends State<MyHomePage> {
                 ),
         ));
   }
-  
+
   /// The message on hold ("anschauen")
   void _showCustomMenu(Offset position, String url) {
     showMenu(
