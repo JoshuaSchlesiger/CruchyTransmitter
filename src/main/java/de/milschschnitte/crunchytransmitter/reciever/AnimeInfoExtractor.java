@@ -70,6 +70,9 @@ public class AnimeInfoExtractor {
                             titleList.add(title);
                         }
                     } else if (i == 2) {
+
+                        int skipper = 0; // Sometimes there is an additional p element
+
                         Elements pElements = col.select("p");
                         if (!pElements.isEmpty() && titleList.size() != 0) {
                             String episodeRaw = "";
@@ -80,6 +83,17 @@ public class AnimeInfoExtractor {
                                     if(imageElements.get(0).attr("src").contains("deutschland-flagge")){
                                         continue;
                                     }
+                                }
+                            }
+
+                            if(pElements.size() > 1){
+                                Elements imageElements = pElements.get(1).getElementsByTag("img");
+                                if(imageElements.size() > 0){
+                                    if(imageElements.get(0).attr("src").contains("deutschland-flagge")){
+                                        continue;
+                                    }
+                                    episodeRaw = pElements.get(1).text();
+                                    skipper++;
                                 }
                             }
                              
@@ -95,11 +109,11 @@ public class AnimeInfoExtractor {
                                 }
                             }
 
-                            String time = pElements.size() > 1 ? pElements.get(1).text() : "";
+                            String time = pElements.size() > skipper + 1 ? pElements.get(skipper + 1).text() : "";
 
                             String correctionDate = "";
-                            if (pElements.size() > 2 && time.endsWith("*"))
-                                correctionDate = pElements.get(2).text();
+                            if (pElements.size() > skipper + 2 && time.endsWith("*"))
+                                correctionDate = pElements.get(skipper + 2).text();
 
                             Anime anime = new Anime();
                             anime.setImageUrl(imageUrlList.get(j));

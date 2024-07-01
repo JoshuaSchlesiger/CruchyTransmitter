@@ -5,7 +5,7 @@ spring.datasource.username=crunchytransmitter
 spring.datasource.password=password
 spring.datasource.driver-class-name=org.postgresql.Driver
 
-crunchyroll.seasonURL = https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de-DE/stories?slug=seasonal-lineup%2F2024%2F4%2F1%2Fcrunchyroll-wochenprogramm-fruehling-2024
+crunchyroll.seasonURL = https://cr-news-api-service.prd.crunchyrollsvc.com/v1/de-DE/stories?slug=seasonal-lineup%2F2024%2F7%2F1%2Fcrunchyroll-wochenprogramm-sommer-2024
 
 spring.api.key = string
 

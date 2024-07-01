@@ -10,12 +10,18 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class Episode {
     private Integer episodeID;
     private String episode;
     private Timestamp releaseTime;
     private Date dateOfWeekday;
     private Date dateOfCorretionDate;
+
+    static Logger logger = LoggerFactory.getLogger(Episode.class);
 
     public Episode(){
         this.episodeID = null;
@@ -42,14 +48,18 @@ public class Episode {
         if(releaseTime.equals("") || releaseTime.equals("TBA")){
             return;
         }
-        
-        String[] parts = releaseTime.split(":");
-        int hours = Integer.parseInt(parts[0]);
-        int minutes = Integer.parseInt(parts[1].split(" ")[0]);
-        
-        LocalTime releaseLocalTime = LocalTime.of(hours, minutes);
-        
-        this.releaseTime = Timestamp.valueOf(LocalDateTime.of(this.dateOfWeekday.toLocalDate(), releaseLocalTime));
+        try {
+            String[] parts = releaseTime.split(":");
+            int hours = Integer.parseInt(parts[0]);
+            int minutes = Integer.parseInt(parts[1].split(" ")[0]);
+            
+            LocalTime releaseLocalTime = LocalTime.of(hours, minutes);
+            
+            this.releaseTime = Timestamp.valueOf(LocalDateTime.of(this.dateOfWeekday.toLocalDate(), releaseLocalTime));
+        } catch (Exception e) {
+            logger.warn("faulty releaseTime: " + releaseTime );
+        }
+
     }
 
     public void setDateOfWeekday(EnumWeekdays weekday){

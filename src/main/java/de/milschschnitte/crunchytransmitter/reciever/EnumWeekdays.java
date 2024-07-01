@@ -3,6 +3,7 @@ package de.milschschnitte.crunchytransmitter.reciever;
 import java.time.DayOfWeek;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,16 +65,16 @@ public enum EnumWeekdays {
     }
 
     public static boolean isInCurrentWeek(Date date) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(Locale.GERMANY);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
         calendar.setTime(date);
         int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
 
-        Calendar today = Calendar.getInstance();
+        Calendar today = Calendar.getInstance(Locale.GERMANY);
+        today.setFirstDayOfWeek(Calendar.MONDAY);
         int currentYear = today.get(Calendar.YEAR);
         int currentWeekOfYear = today.get(Calendar.WEEK_OF_YEAR);
 
-        logger.warn("currentWeek = " + currentWeek);
-        logger.warn("currentWeekOfYear = " + currentWeekOfYear);
         return calendar.get(Calendar.YEAR) == currentYear && currentWeek == currentWeekOfYear;
     }
 }
