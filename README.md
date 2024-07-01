@@ -91,15 +91,5 @@ In your project just write:
 ```
 
 To ensure that **your own server** is also controlled in your app, please take a look at the readme of the branch : flutter_project
-## License
-
-This project is licensed under [apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
-| Permissions      | Conditions | Limitations       |
-|-----------|-------|-------------|
- |🟢 Commercial use | 🔵License and copyright notice|  🔴Liability |
- |🟢Distribution| 🔵State changes| 🔴Trademark use |
- |🟢Modification | | 🔴Warranty |
- |🟢Patent use | 
- |🟢Private use |
 
 
