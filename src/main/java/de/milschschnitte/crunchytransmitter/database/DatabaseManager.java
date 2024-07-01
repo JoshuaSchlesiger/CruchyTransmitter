@@ -152,7 +152,7 @@ public class DatabaseManager {
                             updateStatement.setDate(3, episode.getDateOfCorrectionDate());
                             updateStatement.setInt(4, id);
                             updateStatement.executeUpdate();
-                            logger.info("Updated episode: " + id + ", correction notification will be send");
+                            logger.warn("Updated episode: " + id + ", correction notification will be send");
 
                             Anime anime = getAnimeInformation(animeId);
 

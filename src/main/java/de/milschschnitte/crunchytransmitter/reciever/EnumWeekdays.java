@@ -72,6 +72,8 @@ public enum EnumWeekdays {
         int currentYear = today.get(Calendar.YEAR);
         int currentWeekOfYear = today.get(Calendar.WEEK_OF_YEAR);
 
+        logger.warn("currentWeek = " + currentWeek);
+        logger.warn("currentWeekOfYear = " + currentWeekOfYear);
         return calendar.get(Calendar.YEAR) == currentYear && currentWeek == currentWeekOfYear;
     }
 }
