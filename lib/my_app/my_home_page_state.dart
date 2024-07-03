@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'my_home_page.dart';
 import 'dart:convert';
 
@@ -22,6 +24,7 @@ class MyHomePageState extends State<MyHomePage> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _isLoading = true;
   final Map<int, bool> _isLoadingMap = {};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -125,6 +128,14 @@ class MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,6 +181,7 @@ class MyHomePageState extends State<MyHomePage> {
             )
           : _animeData != null
               ? ListView(
+                  controller: _scrollController,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 20, top: 10),
@@ -254,6 +266,34 @@ class MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
                   ),
                 ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _scrollToTop,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          width: 60.0,
+          height: 60.0,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.orange, width: 2.0),
+          ),
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+              child: Container(
+                color: Colors.black
+                    .withOpacity(0.3), // Adjust opacity and color as needed
+                child: const Icon(
+                  Icons.keyboard_arrow_up,
+                  color: Colors.orange,
+                  size: 36.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
