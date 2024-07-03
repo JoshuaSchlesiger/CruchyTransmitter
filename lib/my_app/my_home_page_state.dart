@@ -83,7 +83,7 @@ class MyHomePageState extends State<MyHomePage> {
           });
         }
 
-        _animeData = sortAnimeByCurrentWeekday(_animeData!);
+        _animeData = sortAnimeByWeekdayAndTime(_animeData!);
         saveAnimeDataToSharedPreferences(
             _animeData!, prefs, _storageKeyAnimeData);
 
