@@ -28,17 +28,21 @@ import jakarta.servlet.http.HttpServletRequest;
 public class BaseDataController {
 
     private Logger logger = LoggerFactory.getLogger(BaseDataController.class);
-    private final Map<String, Bucket> buckets;
+    private final Map<String, Bucket> buckets1;
+    private final Map<String, Bucket> buckets2;
+    private final Map<String, Bucket> buckets3;
 
     public BaseDataController() {
-        this.buckets = new ConcurrentHashMap<>();
+        this.buckets1 = new ConcurrentHashMap<>();
+        this.buckets2 = new ConcurrentHashMap<>();
+        this.buckets3 = new ConcurrentHashMap<>();
     }
 
     @GetMapping("/anime")
     public ResponseEntity<String> getAnimes(HttpServletRequest request) {
         logger.info("Access to /anime Website");
         String ipAddress = request.getRemoteAddr();
-        Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
+        Bucket bucket = buckets1.computeIfAbsent(ipAddress, k -> {
             Bandwidth limit = Bandwidth.classic(
                     Integer.valueOf(ConfigLoader.getProperty("spring.api.animeget.storage")),
                     Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.animeget.refill")),
@@ -65,7 +69,7 @@ public class BaseDataController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-        Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
+        Bucket bucket = buckets2.computeIfAbsent(ipAddress, k -> {
             Bandwidth limit = Bandwidth.classic(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.storage")), Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.token.refill")), Duration.ofMinutes(1)));
             return Bucket.builder().addLimit(limit).build();
         });
@@ -91,8 +95,9 @@ public class BaseDataController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
         }
 
-        Bucket bucket = buckets.computeIfAbsent(ipAddress, k -> {
-            Bandwidth limit = Bandwidth.classic(Integer.valueOf(ConfigLoader.getProperty("spring.api.animesub.storage")), Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.animesub.refill")), Duration.ofMinutes(1)));
+        Bucket bucket = buckets3.computeIfAbsent(ipAddress, k -> {
+            Bandwidth limit = Bandwidth.classic(Integer.valueOf(ConfigLoader.getProperty("spring.api.animesub.storage")), 
+            Refill.greedy(Integer.valueOf(ConfigLoader.getProperty("spring.api.animesub.refill")), Duration.ofMinutes(1)));
             return Bucket.builder().addLimit(limit).build();
         });
 
