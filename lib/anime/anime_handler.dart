@@ -6,20 +6,23 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<Map<Weekday, List<Anime>>> fetchAndGroupAnimeByWeekday() async {
-  List<Anime> animeList = await fetchData();
-  Map<Weekday, List<Anime>> animeMap = groupAnimeByWeekday(animeList);
-  return animeMap;
+Future<Map<Weekday, List<Anime>>?> fetchAndGroupAnimeByWeekday() async {
+  List<Anime>? animeList = await fetchData();
+  if (animeList != null) {
+    Map<Weekday, List<Anime>> animeMap = groupAnimeByWeekday(animeList);
+    return animeMap;
+  }
+  return null;
 }
 
-Future<List<Anime>> fetchData() async {
+Future<List<Anime>?> fetchData() async {
   final response = await http.get(Uri.parse("${Config.serverUrl}anime"));
 
   if (response.statusCode == 200) {
     List<dynamic> data = jsonDecode(response.body);
     return data.map((json) => Anime.fromJson(json)).toList();
   } else {
-    throw Exception('Failed to load data');
+    return null;
   }
 }
 
@@ -88,27 +91,4 @@ Future<void> updateSingleAnimeInSharedPreferences(
   }));
 
   await prefs.setString('animeData', updatedJsonString);
-}
-
-Future<Map<Weekday, List<Anime>>?> handleAnimeStorageAvailability(
-    String? animeDataString, String storageKeyAnimeData, prefs) async {
-  Map<Weekday, List<Anime>>? animeData;
-
-  if (animeDataString != null) {
-    final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
-    animeData = Map<Weekday, List<Anime>>.from(jsonMap.map(
-      (key, value) => MapEntry(WeekdayExtension.fromString(key),
-          (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
-    ));
-    animeData = sortAnimeByCurrentWeekday(animeData);
-    await saveAnimeDataToSharedPreferences(
-        animeData, prefs, storageKeyAnimeData);
-  } else {
-    animeData = await fetchAndGroupAnimeByWeekday();
-    animeData = sortAnimeByCurrentWeekday(animeData);
-    await saveAnimeDataToSharedPreferences(
-        animeData, prefs, storageKeyAnimeData);
-  }
-
-  return animeData;
 }

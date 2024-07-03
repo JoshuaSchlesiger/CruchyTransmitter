@@ -4,13 +4,11 @@ import 'dart:convert';
 import 'package:crunchy_transmitter/anime/anime.dart';
 import 'package:crunchy_transmitter/anime/anime_handler.dart';
 import 'package:crunchy_transmitter/fcm.dart';
-import 'package:crunchy_transmitter/helper_functions.dart';
 
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:week_number/iso.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -18,7 +16,6 @@ class MyHomePageState extends State<MyHomePage> {
   int selectedIndex = 0;
   final String _storageKeyFilterIndex = 'filter';
   final String _storageKeyAnimeData = 'animeData';
-  final String _storageKeyDateTimeUpdate = 'dateTimeUpdate';
 
   Map<Weekday, List<Anime>>? _animeData;
 
@@ -49,29 +46,17 @@ class MyHomePageState extends State<MyHomePage> {
     });
 
     _prefs.then((prefs) async {
-      final DateTime? dateTimeUpdate =
-          await loadSavedTime(_storageKeyDateTimeUpdate, prefs);
+      _animeData = await fetchAndGroupAnimeByWeekday();
 
-      //if it's null, then it's okay and it will just set the current time,
-      //but if not, then a fetch to the server must be made and all the subscribed anime will be loaded to the new anime from the get
-      if (dateTimeUpdate == null) {
-        await prefs.setInt(
-            _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
-      } else {
-        DateTime now = DateTime.now();
-        int differenceInDays = now.difference(dateTimeUpdate).inDays;
+      Map<Weekday, List<Anime>>? animeOldStorage;
 
-        if (differenceInDays >= 1 ||
-            now.weekNumber != dateTimeUpdate.weekNumber) {
-          await prefs.setInt(
-              _storageKeyDateTimeUpdate, DateTime.now().millisecondsSinceEpoch);
+      if (_animeData != null) {
+        final String? animeDataStringOld =
+            prefs.getString(_storageKeyAnimeData);
 
-          _animeData = await fetchAndGroupAnimeByWeekday();
-
-          final String? animeDataString = prefs.getString(_storageKeyAnimeData);
-          final Map<String, dynamic> jsonMap = jsonDecode(animeDataString!);
-          Map<Weekday, List<Anime>>? animeOldStorage =
-              Map<Weekday, List<Anime>>.from(jsonMap.map(
+        if (animeDataStringOld != null) {
+          final Map<String, dynamic> jsonMap = jsonDecode(animeDataStringOld);
+          animeOldStorage = Map<Weekday, List<Anime>>.from(jsonMap.map(
             (key, value) => MapEntry(
                 WeekdayExtension.fromString(key),
                 (value as List)
@@ -79,10 +64,10 @@ class MyHomePageState extends State<MyHomePage> {
                     .toList()),
           ));
 
-          _animeData!.forEach((weekday, animeList) {
-            if (animeOldStorage[weekday] != null) {
+          _animeData?.forEach((weekday, animeList) {
+            if (animeOldStorage?[weekday] != null) {
               for (Anime anime in animeList) {
-                Anime existingAnime = animeOldStorage[weekday]!
+                Anime existingAnime = animeOldStorage![weekday]!
                     .firstWhere((e) => e.animeId == anime.animeId);
                 if (existingAnime != null) {
                   anime.notification = existingAnime.notification;
@@ -90,23 +75,35 @@ class MyHomePageState extends State<MyHomePage> {
               }
             }
           });
-
-          _animeData = sortAnimeByCurrentWeekday(_animeData!);
-          saveAnimeDataToSharedPreferences(
-              _animeData!, prefs, _storageKeyAnimeData);
         }
+
+        _animeData = sortAnimeByCurrentWeekday(_animeData!);
+        saveAnimeDataToSharedPreferences(
+            _animeData!, prefs, _storageKeyAnimeData);
+      } else {
+        showDialog(
+          // ignore: use_build_context_synchronously
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Fehler'),
+            content: const Text(
+                "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut."),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
       }
 
       //Filter option on top is save for next app open
       final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
       if (filterIndex != null) {
         selectedIndex = filterIndex;
-      }
-
-      if (_animeData == null) {
-        final String? animeDataString = prefs.getString(_storageKeyAnimeData);
-        _animeData = await handleAnimeStorageAvailability(
-            animeDataString, _storageKeyAnimeData, prefs);
       }
 
       setState(() {
@@ -282,7 +279,7 @@ class MyHomePageState extends State<MyHomePage> {
       child: Align(
         alignment: Alignment.center,
         child: Text(
-          title.toGerman(),
+          '${title.toGerman()} ${anime[0].episode.dateOfWeekday.day}. ${_getMonthName(anime[0].episode.dateOfWeekday.month)}',
           style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
@@ -539,5 +536,23 @@ class MyHomePageState extends State<MyHomePage> {
         ),
       ],
     );
+  }
+
+  String _getMonthName(int month) {
+    const List<String> months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return months[month - 1];
   }
 }
