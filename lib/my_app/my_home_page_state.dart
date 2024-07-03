@@ -50,7 +50,7 @@ class MyHomePageState extends State<MyHomePage> {
 
       Map<Weekday, List<Anime>>? animeOldStorage;
 
-      if (_animeData != null) {
+      if (_animeData != null && _animeData!.isNotEmpty) {
         final String? animeDataStringOld =
             prefs.getString(_storageKeyAnimeData);
 
