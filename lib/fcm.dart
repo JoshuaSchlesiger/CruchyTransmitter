@@ -106,6 +106,9 @@ class FCM {
           responseMessage = "Es gab einen Fehler auf der Serverseite";
           return -1;
         }
+      } else if (response.statusCode == 429) {
+        responseMessage = "Du hast zu viele Anfragen an den Server gestellt, mache etwas langsamer. Bitte Danke ^^";
+        return -1;
       } else {
         responseMessage = response.statusCode.toString();
         return -1;

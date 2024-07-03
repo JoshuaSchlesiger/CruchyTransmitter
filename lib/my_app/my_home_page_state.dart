@@ -32,6 +32,9 @@ class MyHomePageState extends State<MyHomePage> {
         String? url = message.data['url'];
         if (url != null && url.isNotEmpty) {
           await launchUrl(Uri.parse(url));
+        } else {
+          errorDialog(
+              "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
         }
       }
     });
@@ -41,6 +44,9 @@ class MyHomePageState extends State<MyHomePage> {
         String? url = message.data['url'];
         if (url != null && url.isNotEmpty) {
           await launchUrl(Uri.parse(url));
+        } else {
+          errorDialog(
+              "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
         }
       }
     });
@@ -80,35 +86,20 @@ class MyHomePageState extends State<MyHomePage> {
         _animeData = sortAnimeByCurrentWeekday(_animeData!);
         saveAnimeDataToSharedPreferences(
             _animeData!, prefs, _storageKeyAnimeData);
+
+        //Filter option on top is save for next app open
+        final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
+        if (filterIndex != null) {
+          selectedIndex = filterIndex;
+        }
+
+        setState(() {
+          _isLoading = false;
+        });
       } else {
-        showDialog(
-          // ignore: use_build_context_synchronously
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Fehler'),
-            content: const Text(
-                "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut."),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
+        errorDialog(
+            "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut.");
       }
-
-      //Filter option on top is save for next app open
-      final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
-      if (filterIndex != null) {
-        selectedIndex = filterIndex;
-      }
-
-      setState(() {
-        _isLoading = false;
-      });
     });
   }
 
@@ -379,22 +370,7 @@ class MyHomePageState extends State<MyHomePage> {
                   "Es gab einen Fehler beim Senden. Es kann sein das du kein Internet hast.";
             }
 
-            showDialog(
-              // ignore: use_build_context_synchronously
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Fehler'),
-                content: Text(errorMessage),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            );
+            errorDialog(errorMessage);
           }
           _updateAnime(anime);
           setState(() {
@@ -473,7 +449,7 @@ class MyHomePageState extends State<MyHomePage> {
                             )
                           else
                             Text(
-                              'Komm am: $dateOfCorretionDate',
+                              'Kommt am: $dateOfCorretionDate',
                               style: const TextStyle(
                                 color: Colors.white,
                               ),
@@ -510,7 +486,12 @@ class MyHomePageState extends State<MyHomePage> {
               ),
               child: ElevatedButton(
                 onPressed: () async {
-                  await launchUrl(Uri.parse(url));
+                  if (url == "") {
+                    errorDialog(
+                        "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
+                  } else {
+                    await launchUrl(Uri.parse(url));
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -554,5 +535,24 @@ class MyHomePageState extends State<MyHomePage> {
       'Dec'
     ];
     return months[month - 1];
+  }
+
+  void errorDialog(String message) {
+    showDialog(
+      // ignore: use_build_context_synchronously
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Fehler'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
