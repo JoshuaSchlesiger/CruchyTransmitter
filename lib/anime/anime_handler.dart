@@ -39,13 +39,23 @@ Map<Weekday, List<Anime>> groupAnimeByWeekday(List<Anime> animeList) {
 }
 
 Map<Weekday, List<Anime>> sortAnimeByWeekdayAndTime(Map<Weekday, List<Anime>> animeData) {
+  final currentWeekday = DateTime.now().weekday;
+  
+  final orderedWeekdays = Weekday.values
+      .where((weekday) => animeData.containsKey(weekday))
+      .toList();
+  
+  final rotatedWeekdays = orderedWeekdays.sublist(currentWeekday - 1)
+      ..addAll(orderedWeekdays.sublist(0, currentWeekday - 1));
+  
   final sortedAnimeData = <Weekday, List<Anime>>{};
-
-  animeData.forEach((weekday, animeList) {
+  
+  rotatedWeekdays.forEach((weekday) {
+    final animeList = animeData[weekday] ?? [];
     animeList.sort((a, b) => a.episode.releaseTime.compareTo(b.episode.releaseTime));
     sortedAnimeData[weekday] = animeList;
   });
-
+  
   return sortedAnimeData;
 }
 
