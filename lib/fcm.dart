@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FCM {
-
   ///if an error occurs when getting or posting the subscription, this varriable is the memory for outside
   static String responseMessage = "";
 
@@ -26,7 +25,6 @@ class FCM {
   ///when a new token is generated, the old subscriptions are sent to the server
   static void handleToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
 
     String? savedToken = prefs.getString('token');
 
@@ -83,9 +81,13 @@ class FCM {
 
   static Future<int> changeSubscriptionAnime(int animeId) async {
     final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-
     try {
       String? token = await firebaseMessaging.getToken();
+
+      if (token == null || token == "") {
+        responseMessage = "Konnte kein FCM Token von Google bekommen";
+        return -1;
+      }
 
       String body = jsonEncode(
           {'token': token, 'password': Config.password, 'animeID': animeId});
@@ -101,10 +103,11 @@ class FCM {
         } else if (response.body == 'deleted') {
           return 0;
         } else {
+          responseMessage = "Es gab einen Fehler auf der Serverseite";
           return -1;
         }
       } else {
-         responseMessage = response.statusCode.toString();
+        responseMessage = response.statusCode.toString();
         return -1;
       }
     } catch (error) {

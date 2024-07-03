@@ -29,7 +29,6 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    FCM.instanceProcess();
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       if (message.notification != null) {
@@ -372,13 +371,23 @@ class MyHomePageState extends State<MyHomePage> {
           } else if (responseCode == 0) {
             anime.notification = false;
           } else {
+            String errorMessage =
+                "Es gab einen Fehler. Versuche es vielleicht in 5 Minuten nochmal. Fehlernachricht: ${FCM.responseMessage}";
+
+            if (FCM.responseMessage.contains("CERTIFICATE_VERIFY_FAILED")) {
+              errorMessage =
+                  "Es gab einen Fehler beim Senden. Es kann sein das du Zertifikatsprobleme hast.";
+            } else if (FCM.responseMessage.contains("No address")) {
+              errorMessage =
+                  "Es gab einen Fehler beim Senden. Es kann sein das du kein Internet hast.";
+            }
+
             showDialog(
               // ignore: use_build_context_synchronously
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text('Fehler'),
-                content: Text(
-                    'Es gab einen Fehler. Versuche es vielleicht in 5 Minuten nochmal. Fehlernachricht: ${FCM.responseMessage}'),
+                content: Text(errorMessage),
                 actions: <Widget>[
                   TextButton(
                     child: const Text('OK'),
