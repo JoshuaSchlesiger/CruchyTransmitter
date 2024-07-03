@@ -76,10 +76,14 @@ class MyHomePageState extends State<MyHomePage> {
           _animeData?.forEach((weekday, animeList) {
             if (animeOldStorage?[weekday] != null) {
               for (Anime anime in animeList) {
-                Anime existingAnime = animeOldStorage![weekday]!
-                    .firstWhere((e) => e.animeId == anime.animeId);
+                Anime? existingAnime;
+
+                animeOldStorage?[weekday]?.forEach((e){
+                  if(e.animeId == anime.animeId) existingAnime = e;
+                });
+
                 if (existingAnime != null) {
-                  anime.notification = existingAnime.notification;
+                  anime.notification = existingAnime!.notification;
                 }
               }
             }
