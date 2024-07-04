@@ -55,57 +55,66 @@ class MyHomePageState extends State<MyHomePage> {
     });
 
     _prefs.then((prefs) async {
-      _animeData = await fetchAndGroupAnimeByWeekday();
+      try {
+        _animeData = await fetchAndGroupAnimeByWeekday();
 
-      Map<Weekday, List<Anime>>? animeOldStorage;
+        Map<Weekday, List<Anime>>? animeOldStorage;
+        if (_animeData != null && _animeData!.isNotEmpty) {
+          final String? animeDataStringOld =
+              prefs.getString(_storageKeyAnimeData);
 
-      if (_animeData != null && _animeData!.isNotEmpty) {
-        final String? animeDataStringOld =
-            prefs.getString(_storageKeyAnimeData);
+          if (animeDataStringOld != null) {
+            final Map<String, dynamic> jsonMap = jsonDecode(animeDataStringOld);
+            animeOldStorage = Map<Weekday, List<Anime>>.from(jsonMap.map(
+              (key, value) => MapEntry(
+                  WeekdayExtension.fromString(key),
+                  (value as List)
+                      .map((e) => Anime.fromJsonInStorage(e))
+                      .toList()),
+            ));
 
-        if (animeDataStringOld != null) {
-          final Map<String, dynamic> jsonMap = jsonDecode(animeDataStringOld);
-          animeOldStorage = Map<Weekday, List<Anime>>.from(jsonMap.map(
-            (key, value) => MapEntry(
-                WeekdayExtension.fromString(key),
-                (value as List)
-                    .map((e) => Anime.fromJsonInStorage(e))
-                    .toList()),
-          ));
+            _animeData?.forEach((weekday, animeList) {
+              if (animeOldStorage?[weekday] != null) {
+                for (Anime anime in animeList) {
+                  Anime? existingAnime;
 
-          _animeData?.forEach((weekday, animeList) {
-            if (animeOldStorage?[weekday] != null) {
-              for (Anime anime in animeList) {
-                Anime? existingAnime;
+                  animeOldStorage?[weekday]?.forEach((e) {
+                    if (e.animeId == anime.animeId) existingAnime = e;
+                  });
 
-                animeOldStorage?[weekday]?.forEach((e){
-                  if(e.animeId == anime.animeId) existingAnime = e;
-                });
-
-                if (existingAnime != null) {
-                  anime.notification = existingAnime!.notification;
+                  if (existingAnime != null) {
+                    anime.notification = existingAnime!.notification;
+                  }
                 }
               }
-            }
+            });
+          }
+
+          _animeData = sortAnimeByWeekdayAndTime(_animeData!);
+          saveAnimeDataToSharedPreferences(
+              _animeData!, prefs, _storageKeyAnimeData);
+
+          //Filter option on top is save for next app open
+          final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
+          if (filterIndex != null) {
+            selectedIndex = filterIndex;
+          }
+
+          setState(() {
+            _isLoading = false;
           });
+        } else {
+          errorDialog(
+              "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut.");
         }
-
-        _animeData = sortAnimeByWeekdayAndTime(_animeData!);
-        saveAnimeDataToSharedPreferences(
-            _animeData!, prefs, _storageKeyAnimeData);
-
-        //Filter option on top is save for next app open
-        final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
-        if (filterIndex != null) {
-          selectedIndex = filterIndex;
+      } catch (e) {
+        if (e.toString().contains("CERTIFICATE")) {
+          errorDialog(
+              "Ein Fehler ist mit dem Zertifikat aufgetreten. Bitte versuche es mit einer anderen Internetverbindung.");
+        } else {
+          errorDialog(
+              "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut. Fehlermeldung: $e");
         }
-
-        setState(() {
-          _isLoading = false;
-        });
-      } else {
-        errorDialog(
-            "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut.");
       }
     });
   }
