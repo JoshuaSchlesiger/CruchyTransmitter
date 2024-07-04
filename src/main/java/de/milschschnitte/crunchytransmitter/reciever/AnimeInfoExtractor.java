@@ -104,7 +104,7 @@ public class AnimeInfoExtractor {
                                 if (index != -1) {
                                     episodeRaw = episodeRaw.substring(index, length - 3);
                                 } else {
-                                    logger.warn("Faulty episodeRaw, skip anime: " + titleList.get(j));
+                                    logger.info("Faulty episodeRaw, skip anime: " + titleList.get(j));
                                     continue;
                                 }
                             }

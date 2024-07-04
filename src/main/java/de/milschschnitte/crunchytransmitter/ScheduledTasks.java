@@ -61,7 +61,7 @@ public class ScheduledTasks {
 
             // SENDING OUTCOMMING ANIME TO CLIENT WITH GOOGLE FCM
             NotificationService.sendNotificationInBlocks("Neue Folge !!!",
-                    animeElement.getTitle() + " - " + episode.getEpisode() + " kam heraus", animeElement.getCrunchyrollUrl() ,animeElement.getAnimeId());
+                    animeElement.getTitle() + " - " + episode.getEpisode() + " sollte nun herausgekommen sein", animeElement.getCrunchyrollUrl() ,animeElement.getAnimeId());
             DatabaseManager.setEpisodedPushed(episode.getEpisodeID());
         }
     }
