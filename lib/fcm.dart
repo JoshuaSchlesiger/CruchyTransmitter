@@ -29,14 +29,17 @@ class FCM {
     String? savedToken = prefs.getString('token');
 
     if (savedToken == null) {
-      await prefs.setString('token', token);
-      sendTokenToServer(token);
+      if (await sendTokenToServer(token)) {
+        await prefs.setString('token', token);
+      }
+
       return;
     }
 
     if (token != savedToken) {
-      await prefs.setString('token', token);
-      sendTokenToServer(token);
+      if (await sendTokenToServer(token)) {
+        await prefs.setString('token', token);
+      }
 
       String? animeDataString = prefs.getString('animeData');
       if (animeDataString == null) {
@@ -60,7 +63,8 @@ class FCM {
     }
   }
 
-  static void sendTokenToServer(String token) async {
+  static Future<bool> sendTokenToServer(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     String body = jsonEncode({'token': token, 'password': Config.password});
     http
         .post(
@@ -73,10 +77,14 @@ class FCM {
         .then((response) {
       if (response.statusCode != 200) {
         responseMessage = response.statusCode.toString();
+        return false;
       }
+      return true;
     }).catchError((error) {
       responseMessage = error;
+      return false;
     });
+    return false;
   }
 
   static Future<int> changeSubscriptionAnime(int animeId) async {
@@ -107,7 +115,8 @@ class FCM {
           return -1;
         }
       } else if (response.statusCode == 429) {
-        responseMessage = "Du hast zu viele Anfragen an den Server gestellt, mache etwas langsamer. Bitte Danke ^^";
+        responseMessage =
+            "Du hast zu viele Anfragen an den Server gestellt, mache etwas langsamer. Bitte Danke ^^";
         return -1;
       } else {
         responseMessage = response.statusCode.toString();
