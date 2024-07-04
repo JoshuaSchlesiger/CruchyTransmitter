@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:crunchy_transmitter/subpages/info_page.dart';
+
 import 'my_home_page.dart';
 import 'dart:convert';
 
@@ -170,22 +172,22 @@ class MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-        actions: const [
-          // IconButton(
-          //   icon: const Icon(
-          //     Icons.settings,
-          //     color: Color.fromARGB(155, 255, 255, 255),
-          //   ),
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //           builder: (context) => SettingsPage(
-          //                 title: widget.title,
-          //               )),
-          //     );
-          //   },
-          // ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.info,
+              color: Color.fromARGB(155, 255, 255, 255),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => InfoPage(
+                          title: widget.title,
+                        )),
+              );
+            },
+          ),
         ],
       ),
       body: _isLoading
