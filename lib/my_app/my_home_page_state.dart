@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:vibration/vibration.dart';
 
 class MyHomePageState extends State<MyHomePage> {
   int selectedIndex = 0;
@@ -433,7 +434,8 @@ class MyHomePageState extends State<MyHomePage> {
           });
         },
         onLongPressStart: (LongPressStartDetails details) {
-          _showCustomMenu(details.globalPosition, anime.crunchyrollUrl);
+          _showCustomMenu(
+              context, details.globalPosition, anime.crunchyrollUrl);
         },
         child: Center(
           child: _isLoadingMap[anime.animeId] != null &&
@@ -526,14 +528,26 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   /// The message on hold ("anschauen")
-  void _showCustomMenu(Offset position, String url) {
+  void _showCustomMenu(BuildContext context, Offset position, String url) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final Offset menuPosition = overlay.globalToLocal(position);
+
+    const double buttonWidth = 160.0; // Breite des Buttons
+    const double buttonHeight = 50.0; // Höhe des Buttons
+
+    final Offset buttonPosition = Offset(
+      menuPosition.dx - buttonWidth / 2,
+      menuPosition.dy - buttonHeight / 2,
+    );
+
     showMenu(
       context: context,
       position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy,
-        position.dx,
-        position.dy,
+        buttonPosition.dx,
+        buttonPosition.dy,
+        buttonPosition.dx + buttonWidth,
+        buttonPosition.dy + buttonHeight,
       ),
       color: const Color.fromARGB(121, 0, 0, 0),
       items: <PopupMenuEntry>[
@@ -549,6 +563,11 @@ class MyHomePageState extends State<MyHomePage> {
               ),
               child: ElevatedButton(
                 onPressed: () async {
+                  bool? hasVibrationPermission = await Vibration.hasVibrator();
+                  if (hasVibrationPermission != null && hasVibrationPermission) {
+                    Vibration.vibrate(duration: 100);
+                  }
+                  
                   if (url == "") {
                     errorDialog(
                         "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
