@@ -450,23 +450,31 @@ class MyHomePageState extends State<MyHomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      ColorFiltered(
-                        colorFilter: anime.notification
-                            ? const ColorFilter.mode(
-                                Colors.transparent,
-                                BlendMode.saturation,
-                              )
-                            : const ColorFilter.mode(
-                                Colors.grey,
-                                BlendMode.saturation,
-                              ),
-                        child: Image.network(
+                      if (!anime.notification)
+                        ShaderMask(
+                          shaderCallback: (Rect bounds) {
+                            return const LinearGradient(
+                              colors: [Colors.black, Colors.white],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              stops: [0.0, 1.0],
+                            ).createShader(bounds);
+                          },
+                          blendMode: BlendMode.saturation,
+                          child: Image.network(
+                            anime.imageUrl,
+                            width: imageWidth,
+                            height: imageHeight,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      else
+                        Image.network(
                           anime.imageUrl,
                           width: imageWidth,
                           height: imageHeight,
                           fit: BoxFit.cover,
                         ),
-                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
