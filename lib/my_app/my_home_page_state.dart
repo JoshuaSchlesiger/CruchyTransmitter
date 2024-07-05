@@ -400,8 +400,9 @@ class MyHomePageState extends State<MyHomePage> {
 
     final String dateOfCorretionDate = '$day. $monthName';
 
-    final double imageHeight = MediaQuery.of(context).size.height * 0.32;
     final double imageWidth = MediaQuery.of(context).size.width * 0.45;
+    final double imageHeight = MediaQuery.of(context).size.width/ MediaQuery.of(context).size.height * 775;
+
 
     return GestureDetector(
         onTap: () async {
