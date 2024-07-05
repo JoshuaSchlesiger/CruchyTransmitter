@@ -22,7 +22,7 @@ public class FirebaseConfig {
      */
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
-        Resource resource = new ClassPathResource("crunchy-transmitter-firebase-adminsdk-fondb-7cc6dde6c0.json");
+        Resource resource = new ClassPathResource("crunchy-transmitter-firebase-adminsdk-fondb-bf8a8f2a1f.json");
         InputStream serviceAccount = resource.getInputStream();
 
         FirebaseOptions options = FirebaseOptions.builder()

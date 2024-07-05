@@ -15,7 +15,7 @@ public class SecurityConfiguration {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/anime", "/registerToken", "/updateAnimeSub").permitAll()
+                .requestMatchers("/anime", "/registerToken", "/updateAnimeSub", "/privacy").permitAll()
                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
