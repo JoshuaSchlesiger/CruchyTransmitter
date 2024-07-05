@@ -378,6 +378,11 @@ public class DatabaseManager {
     }
 
     public static String changeAnimeSub(String token, String animeId) {
+        String selectQueryToken = "SELECT id FROM tokens WHERE token = ?";
+
+        String insertQueryToken = "INSERT INTO tokens (token) " +
+                "VALUES (?)";
+
         String selectQuery = "SELECT 1 FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?) AND anime_id = ?";
 
         String insertQuery = "INSERT INTO anime_tokens (token_id, anime_id) " +
@@ -386,9 +391,19 @@ public class DatabaseManager {
         String deleteQuery = "DELETE FROM anime_tokens WHERE token_id = (SELECT id FROM tokens WHERE token = ?) AND anime_id = ?";
 
         try (Connection connection = getConnection();
+                PreparedStatement pstmtSelectToken = connection.prepareStatement(selectQueryToken);
+                PreparedStatement pstmtInsertToken = connection.prepareStatement(insertQueryToken);
                 PreparedStatement pstmtSelect = connection.prepareStatement(selectQuery);
                 PreparedStatement pstmtInsert = connection.prepareStatement(insertQuery);
                 PreparedStatement pstmtDelete = connection.prepareStatement(deleteQuery)) {
+
+            pstmtSelectToken.setString(1, token);
+            ResultSet resultSetToken = pstmtSelectToken.executeQuery();
+
+            if (!resultSetToken.next()) {
+                pstmtInsertToken.setString(1, token);
+                pstmtInsertToken.executeUpdate();
+            } 
 
             pstmtSelect.setString(1, token);
             pstmtSelect.setInt(2, Integer.parseInt(animeId));
