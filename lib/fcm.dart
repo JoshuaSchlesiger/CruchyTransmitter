@@ -3,6 +3,7 @@ import 'package:crunchy_transmitter/config/config.dart';
 import 'package:crunchy_transmitter/weekday.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,62 +30,61 @@ class FCM {
     String? savedToken = prefs.getString('token');
 
     if (savedToken == null) {
-      if (await sendTokenToServer(token)) {
+      if (await sendTokenToServer(token, prefs)) {
         await prefs.setString('token', token);
       }
-
       return;
     }
 
     if (token != savedToken) {
-      if (await sendTokenToServer(token)) {
+      if (await sendTokenToServer(token, prefs)) {
         await prefs.setString('token', token);
-      }
 
-      String? animeDataString = prefs.getString('animeData');
-      if (animeDataString == null) {
-        return;
-      }
-
-      final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
-      Map<Weekday, List<Anime>>? animeData =
-          Map<Weekday, List<Anime>>.from(jsonMap.map(
-        (key, value) => MapEntry(WeekdayExtension.fromString(key),
-            (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
-      ));
-
-      animeData.forEach((weekday, animeList) async {
-        for (var anime in animeList) {
-          if (anime.notification) {
-            await changeSubscriptionAnime(anime.animeId);
-          }
+        String? animeDataString = prefs.getString('animeData');
+        if (animeDataString == null) {
+          return;
         }
-      });
+
+        final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
+        Map<Weekday, List<Anime>>? animeData =
+            Map<Weekday, List<Anime>>.from(jsonMap.map(
+          (key, value) => MapEntry(WeekdayExtension.fromString(key),
+              (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
+        ));
+
+        animeData.forEach((weekday, animeList) async {
+          for (var anime in animeList) {
+            if (anime.notification) {
+              await changeSubscriptionAnime(anime.animeId);
+            }
+          }
+        });
+      }
     }
   }
 
-  static Future<bool> sendTokenToServer(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  static Future<bool> sendTokenToServer(
+      String token, SharedPreferences prefs) async {
     String body = jsonEncode({'token': token, 'password': Config.password});
-    http
-        .post(
-      Uri.parse("${Config.serverUrl}registerToken"),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body,
-    )
-        .then((response) {
+
+    try {
+      Response response = await http.post(
+        Uri.parse("${Config.serverUrl}registerToken"),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
       if (response.statusCode != 200) {
         responseMessage = response.statusCode.toString();
         return false;
       }
       return true;
-    }).catchError((error) {
-      responseMessage = error;
+    } catch (e) {
+      responseMessage = e.toString();
       return false;
-    });
-    return false;
+    }
   }
 
   static Future<int> changeSubscriptionAnime(int animeId) async {
