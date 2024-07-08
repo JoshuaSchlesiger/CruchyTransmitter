@@ -33,11 +33,12 @@ class MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print("onMessageOpenedApp");
       if (message.notification != null) {
         String? url = message.data['url'];
         if (url != null && url.isNotEmpty) {
-          await launchUrl(Uri.parse(url));
+          launchUrl(Uri.parse(url));
         } else {
           errorDialog(
               "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
@@ -45,11 +46,12 @@ class MyHomePageState extends State<MyHomePage> {
       }
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("onMessage");
       if (message.notification != null) {
         String? url = message.data['url'];
         if (url != null && url.isNotEmpty) {
-          await launchUrl(Uri.parse(url));
+          launchUrl(Uri.parse(url));
         } else {
           errorDialog(
               "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
