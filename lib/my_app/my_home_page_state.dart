@@ -34,7 +34,6 @@ class MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("onMessageOpenedApp");
       if (message.notification != null) {
         String? url = message.data['url'];
         if (url != null && url.isNotEmpty) {
@@ -47,7 +46,6 @@ class MyHomePageState extends State<MyHomePage> {
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("onMessage");
       if (message.notification != null) {
         String? url = message.data['url'];
         if (url != null && url.isNotEmpty) {
