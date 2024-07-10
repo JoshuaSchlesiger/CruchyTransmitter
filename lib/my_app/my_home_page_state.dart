@@ -58,6 +58,19 @@ class MyHomePageState extends State<MyHomePage> {
     });
 
     _prefs.then((prefs) async {
+      
+      bool? backgroundMessage = prefs.getBool("backgroundMessage");
+      if (backgroundMessage != null) {
+        if (backgroundMessage) {
+          launchUrl(Uri.parse(prefs.getString("backgroundMessageURL")!));
+        } else {
+          errorDialog(
+              "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
+        }
+        prefs.remove("backgroundMessage");
+        prefs.remove("backgroundMessageURL");
+      }
+
       try {
         _animeData = await fetchAndGroupAnimeByWeekday();
 
@@ -401,8 +414,7 @@ class MyHomePageState extends State<MyHomePage> {
     final String dateOfCorretionDate = '$day. $monthName';
 
     final double imageWidth = MediaQuery.of(context).size.width * 0.45;
-    final double imageHeight = MediaQuery.of(context).size.width  * 0.65;
-
+    final double imageHeight = MediaQuery.of(context).size.width * 0.65;
 
     return GestureDetector(
         onTap: () async {
@@ -565,10 +577,11 @@ class MyHomePageState extends State<MyHomePage> {
               child: ElevatedButton(
                 onPressed: () async {
                   bool? hasVibrationPermission = await Vibration.hasVibrator();
-                  if (hasVibrationPermission != null && hasVibrationPermission) {
+                  if (hasVibrationPermission != null &&
+                      hasVibrationPermission) {
                     Vibration.vibrate(duration: 100);
                   }
-                  
+
                   if (url == "") {
                     errorDialog(
                         "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
