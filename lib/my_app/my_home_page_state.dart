@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:crunchy_transmitter/subpages/info_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'my_home_page.dart';
 import 'dart:convert';
@@ -14,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:vibration/vibration.dart';
 
 class MyHomePageState extends State<MyHomePage> {
@@ -33,43 +33,21 @@ class MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if (message.notification != null) {
-        String? url = message.data['url'];
-        if (url != null && url.isNotEmpty) {
-          launchUrl(Uri.parse(url));
-        } else {
-          errorDialog(
-              "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
-        }
-      }
-    });
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null) {
-        String? url = message.data['url'];
-        if (url != null && url.isNotEmpty) {
-          launchUrl(Uri.parse(url));
-        } else {
-          errorDialog(
-              "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
+    FirebaseMessaging.instance.getInitialMessage().then((message) async {
+      if (message != null) {
+        if (message.notification != null) {
+          String? url = message.data['url'];
+          if (url != null && url.isNotEmpty) {
+            launchUrl(Uri.parse(url));
+          } else {
+            errorDialog(
+                "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
+          }
         }
       }
     });
 
     _prefs.then((prefs) async {
-      
-      bool? backgroundMessage = prefs.getBool("backgroundMessage");
-      if (backgroundMessage != null) {
-        if (backgroundMessage) {
-          launchUrl(Uri.parse(prefs.getString("backgroundMessageURL")!));
-        } else {
-          errorDialog(
-              "Aktuell ist der Anime bei Crunchyroll noch nicht angelegt.");
-        }
-        prefs.remove("backgroundMessage");
-        prefs.remove("backgroundMessageURL");
-      }
 
       try {
         _animeData = await fetchAndGroupAnimeByWeekday();
