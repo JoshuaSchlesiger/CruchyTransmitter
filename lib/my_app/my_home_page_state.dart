@@ -299,23 +299,28 @@ class MyHomePageState extends State<MyHomePage> {
         onPressed: _scrollToTop,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: Container(
-          width: 60.0,
-          height: 60.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.orange, width: 2.0),
-          ),
-          child: ClipOval(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-              child: Container(
-                color: Colors.black
-                    .withOpacity(0.3), // Adjust opacity and color as needed
-                child: const Icon(
-                  Icons.keyboard_arrow_up,
-                  color: Colors.orange,
-                  size: 36.0,
+        child: InkWell(
+          borderRadius:
+              BorderRadius.circular(30.0), // Ensure the InkWell is circular
+          onTap: _scrollToTop,
+          child: Container(
+            width: 60.0,
+            height: 60.0,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.orange, width: 2.0),
+            ),
+            child: ClipOval(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                child: Container(
+                  color: Colors.black
+                      .withOpacity(0.3), // Adjust opacity and color as needed
+                  child: const Icon(
+                    Icons.keyboard_arrow_up,
+                    color: Colors.orange,
+                    size: 36.0,
+                  ),
                 ),
               ),
             ),
