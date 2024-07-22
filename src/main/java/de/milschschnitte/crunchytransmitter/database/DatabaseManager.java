@@ -116,7 +116,7 @@ public class DatabaseManager {
                 selectStatement.setString(2, episode.getEpisode());
                 ResultSet resultSet = selectStatement.executeQuery();
 
-                if (resultSet.next()) {
+                while (resultSet.next()) {
                     int id = resultSet.getInt("id");
 
                     Timestamp existingReleaseTime = resultSet.getTimestamp("releaseTime");
