@@ -68,8 +68,7 @@ public class DatabaseManager {
                             updateStatement.setInt(3, id);
                             updateStatement.executeUpdate();
 
-                            logger.info("Updatet anime: " + id + ", notification will be send");
-                            // SEND UPDATE TO CLIENT WITH GOOGLE FCM ONLY ANIME INFORMATION
+                            logger.info("Updated anime: " + id + ", notification will be send");
                         }
                     } else if (!existingCrunchyrollurl.equals(anime.getCrunchyrollUrl())) {
                         try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
@@ -78,8 +77,7 @@ public class DatabaseManager {
                             updateStatement.setInt(3, id);
                             updateStatement.executeUpdate();
 
-                            logger.info("Updatet anime: " + id + ", notification will be send");
-                            // SEND UPDATE TO CLIENT WITH GOOGLE FCM ONLY ANIME INFORMATION
+                            logger.info("Updated anime: " + id + ", notification will be send");
                         }
                     }
 
@@ -104,7 +102,7 @@ public class DatabaseManager {
 
     public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException {
         // Catching empty episodeTitle
-        if (episode.getEpisode() == null ) {
+        if (episode.getEpisode() == null) {
             return -1;
         }
 
@@ -125,47 +123,48 @@ public class DatabaseManager {
                     Date existingDateOfWeekday = resultSet.getDate("dateOfWeekday");
                     Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
 
-                    if (!EnumWeekdays.isInCurrentWeek(existingDateOfWeekday)) {
-                        return -1;
-                    }
-
-                    boolean needsUpdate = false;
-                    if ((episode.getReleaseTime() != null && existingReleaseTime == null) || (episode.getReleaseTime() != null && !episode.getReleaseTime().equals(existingReleaseTime))) {
-                        needsUpdate = true;
-                    }
-
-                    if (!existingDateOfWeekday.equals(episode.getDateOfWeekday())) {
-                        needsUpdate = true;
-                    }
-
-                    if (existingCorrectionDate != null
-                            && !existingCorrectionDate.equals(episode.getDateOfCorrectionDate())) {
-                        needsUpdate = true;
-                    } else if (existingCorrectionDate == null && episode.getDateOfCorrectionDate() != null) {
-                        needsUpdate = true;
-                    }
-
-                    if (needsUpdate) {
-                        try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
-                            updateStatement.setTimestamp(1, episode.getReleaseTime());
-                            updateStatement.setDate(2, episode.getDateOfWeekday());
-                            updateStatement.setDate(3, episode.getDateOfCorrectionDate());
-                            updateStatement.setInt(4, id);
-                            updateStatement.executeUpdate();
-                            logger.warn("Updated episode: " + id + ", correction notification will be send");
-
-                            Anime anime = getAnimeInformation(animeId);
-
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm");
-
-                            String formattedReleaseTime = dateFormat.format(episode.getReleaseTime());
-                            NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
-                                    formattedReleaseTime + " - " + episode.getEpisode() + " - " + anime.getTitle(), anime.getCrunchyrollUrl(),
-                                    animeId);
+                    if (EnumWeekdays.isInCurrentWeek(existingDateOfWeekday)) {
+                        boolean needsUpdate = false;
+                        if ((episode.getReleaseTime() != null && existingReleaseTime == null)
+                                || (episode.getReleaseTime() != null
+                                        && !episode.getReleaseTime().equals(existingReleaseTime))) {
+                            needsUpdate = true;
                         }
-                    }
 
-                    return id;
+                        if (!existingDateOfWeekday.equals(episode.getDateOfWeekday())) {
+                            needsUpdate = true;
+                        }
+
+                        if (existingCorrectionDate != null
+                                && !existingCorrectionDate.equals(episode.getDateOfCorrectionDate())) {
+                            needsUpdate = true;
+                        } else if (existingCorrectionDate == null && episode.getDateOfCorrectionDate() != null) {
+                            needsUpdate = true;
+                        }
+
+                        if (needsUpdate) {
+                            try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                                updateStatement.setTimestamp(1, episode.getReleaseTime());
+                                updateStatement.setDate(2, episode.getDateOfWeekday());
+                                updateStatement.setDate(3, episode.getDateOfCorrectionDate());
+                                updateStatement.setInt(4, id);
+                                updateStatement.executeUpdate();
+                                logger.warn("Updated episode: " + id + ", correction notification will be send");
+
+                                Anime anime = getAnimeInformation(animeId);
+
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm");
+
+                                String formattedReleaseTime = dateFormat.format(episode.getReleaseTime());
+                                NotificationService.sendNotificationInBlocks("Änderung zu einem Anime !!!",
+                                        formattedReleaseTime + " - " + episode.getEpisode() + " - " + anime.getTitle(),
+                                        anime.getCrunchyrollUrl(),
+                                        animeId);
+                            }
+                        }
+
+                        return id;
+                    }
                 }
             }
 
@@ -179,6 +178,8 @@ public class DatabaseManager {
                 ResultSet resultSet = insertStatement.executeQuery();
 
                 if (resultSet.next()) {
+                    logger.info(String.valueOf(resultSet.getInt(1)));
+
                     return resultSet.getInt(1);
                 } else {
                     throw new SQLException("Inserting episode failed, no ID obtained.");
@@ -403,7 +404,7 @@ public class DatabaseManager {
             if (!resultSetToken.next()) {
                 pstmtInsertToken.setString(1, token);
                 pstmtInsertToken.executeUpdate();
-            } 
+            }
 
             pstmtSelect.setString(1, token);
             pstmtSelect.setInt(2, Integer.parseInt(animeId));
