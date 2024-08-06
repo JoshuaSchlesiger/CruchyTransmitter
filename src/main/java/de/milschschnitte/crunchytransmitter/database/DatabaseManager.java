@@ -106,7 +106,7 @@ public class DatabaseManager {
             return -1;
         }
 
-        String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE anime_id = ? AND episode = ?";
+        String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate, episode FROM episodes WHERE anime_id = ? AND episode = ?";
         String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ? WHERE id = ?";
         String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
@@ -164,6 +164,11 @@ public class DatabaseManager {
                         }
 
                         return id;
+                    }
+                    else {
+                        if(resultSet.getString("episode") == episode.getEpisode()){
+                            return -1;
+                        }
                     }
                 }
             }
