@@ -116,7 +116,7 @@ public class DatabaseManager {
                 selectStatement.setString(2, episode.getEpisode());
                 ResultSet resultSet = selectStatement.executeQuery();
 
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     int id = resultSet.getInt("id");
 
                     Timestamp existingReleaseTime = resultSet.getTimestamp("releaseTime");
@@ -166,9 +166,8 @@ public class DatabaseManager {
                         return id;
                     }
                     else {
-                        if(resultSet.getString("episode") == episode.getEpisode()){
-                            return -1;
-                        }
+                        logger.warn("selectQuery not in current week for result_id (skipping insert): " + resultSet.getInt("id"));
+                        return -1;
                     }
                 }
             }
