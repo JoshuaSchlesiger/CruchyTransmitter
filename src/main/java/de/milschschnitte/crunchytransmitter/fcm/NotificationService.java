@@ -9,6 +9,7 @@ import com.google.firebase.messaging.SendResponse;
 
 import de.milschschnitte.crunchytransmitter.database.DatabaseManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +21,13 @@ public class NotificationService {
     static Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     /*
-     * Google fcm allows you to send in blocks, but only with a maximum of 500 elements per block
+     * Google fcm allows you to send in blocks, but only with a maximum of 500
+     * elements per block
      */
     public static void sendNotificationInBlocks(String notificationTitle, String body, String url, Integer animeId) {
         List<String> tokens = DatabaseManager.getAllTokensForAnime(animeId);
         int blockSize = 500;
-    
+
         Integer successfully = 0;
 
         for (int i = 0; i < tokens.size(); i += blockSize) {
@@ -37,13 +39,18 @@ public class NotificationService {
         logger.warn("Sended all notification to users. Sended " + successfully + " successfully");
     }
 
-    private static Integer sendNotificationBlock(String notificationTitle, String body, String url ,List<String> blockTokens) {
+    private static Integer sendNotificationBlock(String notificationTitle, String body, String url,
+            List<String> blockTokens) {
         List<Message> messages = new ArrayList<>();
 
+        String notificationTitle_UTF_8 = new String(notificationTitle.getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8);
+        String body_UTF_8 = new String(body.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+
         for (String token : blockTokens) {
-            //Bulding message for user notific.
+            // Bulding message for user notific.
             Message message = Message.builder()
-                    .setNotification(Notification.builder().setTitle(notificationTitle).setBody(body).build())
+                    .setNotification(Notification.builder().setTitle(notificationTitle_UTF_8).setBody(body_UTF_8).build())
                     .setToken(token)
                     .putData("url", url)
                     .build();
