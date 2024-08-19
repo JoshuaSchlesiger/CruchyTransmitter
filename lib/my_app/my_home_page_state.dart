@@ -99,7 +99,7 @@ class MyHomePageState extends State<MyHomePage> {
           });
         } else {
           errorDialog(
-              "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut.");
+              "Aktuell hat Crunchyroll noch keinen Wochenplan veröffentlicht, bitte versuche es später erneut.");
         }
       } catch (e) {
         if (e.toString().contains("CERTIFICATE")) {
