@@ -106,24 +106,30 @@ public class DatabaseManager {
             return -1;
         }
 
-        String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate, episode FROM episodes WHERE anime_id = ? AND episode = ?";
+        String selectQuery = "SELECT id, releaseTime, dateOfWeekday, dateOfCorrectionDate, episode FROM episodes WHERE anime_id = ?";
         String updateQuery = "UPDATE episodes SET releaseTime = ?, dateOfWeekday = ?, dateOfCorrectionDate = ? WHERE id = ?";
         String insertQuery = "INSERT INTO episodes (anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate, sendedPushToUser) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
                 selectStatement.setInt(1, animeId);
-                selectStatement.setString(2, episode.getEpisode());
                 ResultSet resultSet = selectStatement.executeQuery();
 
-                if (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-
-                    Timestamp existingReleaseTime = resultSet.getTimestamp("releaseTime");
+                while (resultSet.next()) {
+                
                     Date existingDateOfWeekday = resultSet.getDate("dateOfWeekday");
-                    Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
-
+                    
                     if (EnumWeekdays.isInCurrentWeek(existingDateOfWeekday)) {
+
+                        int id = resultSet.getInt("id");
+                        String episodeResult = resultSet.getString("episode");
+                        Timestamp existingReleaseTime = resultSet.getTimestamp("releaseTime");
+                        Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
+
+                        if(!episodeResult.equals(episode.getEpisode())){
+                            return -1;
+                        }
+
                         boolean needsUpdate = false;
                         if ((episode.getReleaseTime() != null && existingReleaseTime == null)
                                 || (episode.getReleaseTime() != null
@@ -165,10 +171,6 @@ public class DatabaseManager {
 
                         return id;
                     }
-                    else {
-                        logger.warn("selectQuery not in current week for result_id (skipping insert): " + resultSet.getInt("id"));
-                        return -1;
-                    }
                 }
             }
 
@@ -182,7 +184,7 @@ public class DatabaseManager {
                 ResultSet resultSet = insertStatement.executeQuery();
 
                 if (resultSet.next()) {
-                    logger.info(String.valueOf(resultSet.getInt(1)));
+                    logger.warn("inserted new episode with id: " + resultSet.getInt("id"));
 
                     return resultSet.getInt(1);
                 } else {
