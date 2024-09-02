@@ -13,56 +13,56 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class Episode {
     private Integer episodeID;
     private String episode;
     private Timestamp releaseTime;
     private Date dateOfWeekday;
-    private Date dateOfCorrectionDate;
+    private Date dateOfCorretionDate;
 
     static Logger logger = LoggerFactory.getLogger(Episode.class);
 
-    public Episode() {
+    public Episode(){
         this.episodeID = null;
         this.episode = "";
         this.releaseTime = null;
         this.dateOfWeekday = null;
-        this.dateOfCorrectionDate = null;
+        this.dateOfCorretionDate = null;
     }
 
-    public Episode(Integer episodeID, String episode, Timestamp releaseTime, Date dateOfWeekday,
-            Date dateOfCorrectionDate) {
+    public Episode(Integer episodeID, String episode, Timestamp releaseTime, Date dateOfWeekday, Date dateOfCorretionDate){
         this.episodeID = episodeID;
         this.episode = episode;
         this.releaseTime = releaseTime;
         this.dateOfWeekday = dateOfWeekday;
-        this.dateOfCorrectionDate = dateOfCorrectionDate;
+        this.dateOfCorretionDate = dateOfCorretionDate;
     }
 
-    public void setEpisodes(String episode) {
+    public void setEpisodes(String episode){
         this.episode = episode;
     }
 
-    public void setReleaseTime(String releaseTime) {
-        // TBA equals to be announced
-        if (releaseTime.equals("") || releaseTime.equals("TBA")) {
+    public void setReleaseTime(String releaseTime){
+        //TBA equals to be announced
+        if(releaseTime.equals("") || releaseTime.equals("TBA")){
             return;
         }
         try {
             String[] parts = releaseTime.split(":");
             int hours = Integer.parseInt(parts[0]);
             int minutes = Integer.parseInt(parts[1].split(" ")[0]);
-
+            
             LocalTime releaseLocalTime = LocalTime.of(hours, minutes);
-
+            
             this.releaseTime = Timestamp.valueOf(LocalDateTime.of(this.dateOfWeekday.toLocalDate(), releaseLocalTime));
         } catch (Exception e) {
-            logger.warn("faulty releaseTime: " + releaseTime);
+            logger.warn("faulty releaseTime: " + releaseTime );
         }
 
     }
 
-    public void setDateOfWeekday(EnumWeekdays weekday) {
+    public void setDateOfWeekday(EnumWeekdays weekday){
         LocalDate today = LocalDate.now();
         DayOfWeek currentDayOfWeek = today.getDayOfWeek();
         DayOfWeek targetDayOfWeek = EnumWeekdays.getDayOfWeek(weekday);
@@ -97,10 +97,10 @@ public class Episode {
 
         int year = LocalDate.now().getYear();
 
-        this.dateOfCorrectionDate = Date.valueOf(LocalDate.of(year, month, day));
+        this.dateOfCorretionDate = Date.valueOf(LocalDate.of(year, month, day));
     }
 
-    public Integer getEpisodeID() {
+    public Integer getEpisodeID(){
         return this.episodeID;
     }
 
@@ -121,14 +121,14 @@ public class Episode {
     }
 
     public Date getDateOfCorrectionDate() {
-        return this.dateOfCorrectionDate;
+        return this.dateOfCorretionDate;
     }
 
     @Override
     public String toString() {
         return "Episode: " + episode + " " +
-                "Release Time: " + releaseTime + " " +
-                "Weekday: " + dateOfWeekday + " " +
-                "Correction Date: " + dateOfCorrectionDate;
+               "Release Time: " + releaseTime + " " +
+               "Weekday: " + dateOfWeekday + " " +
+               "Correction Date: " + dateOfCorretionDate;
     }
 }
