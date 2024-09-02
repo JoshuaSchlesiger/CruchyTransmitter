@@ -118,13 +118,15 @@ public class DatabaseManager {
                 while (resultSet.next()) {
                 
                     Date existingDateOfWeekday = resultSet.getDate("dateOfWeekday");
-                    
+                    String episodeResult = resultSet.getString("episode");
+                    Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
+
                     if (EnumWeekdays.isInCurrentWeek(existingDateOfWeekday)) {
 
                         int id = resultSet.getInt("id");
-                        String episodeResult = resultSet.getString("episode");
+
                         Timestamp existingReleaseTime = resultSet.getTimestamp("releaseTime");
-                        Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
+
 
                         if(!episodeResult.equals(episode.getEpisode())){
                             return -1;
@@ -170,6 +172,9 @@ public class DatabaseManager {
                         }
 
                         return id;
+                    }
+                    else if(episodeResult.equals(episode.getEpisode()) && existingCorrectionDate == null){
+                        return -1;
                     }
                 }
             }

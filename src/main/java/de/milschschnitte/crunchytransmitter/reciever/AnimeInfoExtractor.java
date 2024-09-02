@@ -125,7 +125,7 @@ public class AnimeInfoExtractor {
                             episode.setEpisodes(episodeRaw);
                             episode.setReleaseTime(time);
                             if (!correctionDate.equals(""))
-                                episode.setDateOfCorretionDate(correctionDate);
+                                episode.setDateOfCorrectionDate(correctionDate);
                             
                             animeList.add(anime);
 
