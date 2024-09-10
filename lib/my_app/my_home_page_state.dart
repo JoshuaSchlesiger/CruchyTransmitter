@@ -72,9 +72,17 @@ class MyHomePageState extends State<MyHomePage> {
                 for (Anime anime in animeList) {
                   Anime? existingAnime;
 
+                  bool foundAnime = false;
                   animeOldStorage?[weekday]?.forEach((e) {
-                    if (e.animeId == anime.animeId) existingAnime = e;
+                    if (e.animeId == anime.animeId) {
+                      existingAnime = e;
+                      foundAnime = true;
+                    }
                   });
+
+                  if (!foundAnime) {
+                    animeOldStorage?[weekday]?.add(anime);
+                  }
 
                   if (existingAnime != null) {
                     anime.notification = existingAnime!.notification;
@@ -85,8 +93,14 @@ class MyHomePageState extends State<MyHomePage> {
           }
 
           _animeData = sortAnimeByWeekdayAndTime(_animeData!);
-          saveAnimeDataToSharedPreferences(
-              _animeData!, prefs, _storageKeyAnimeData);
+          if (animeOldStorage != null) {
+            animeOldStorage = sortAnimeByWeekdayAndTime(animeOldStorage);
+            saveAnimeDataToSharedPreferences(
+                animeOldStorage, prefs, _storageKeyAnimeData);
+          } else {
+            saveAnimeDataToSharedPreferences(
+                _animeData!, prefs, _storageKeyAnimeData);
+          }
 
           //Filter option on top is save for next app open
           final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
