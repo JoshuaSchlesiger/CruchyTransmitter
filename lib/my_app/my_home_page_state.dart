@@ -48,7 +48,6 @@ class MyHomePageState extends State<MyHomePage> {
     });
 
     _prefs.then((prefs) async {
-
       try {
         _animeData = await fetchAndGroupAnimeByWeekday();
 
@@ -73,19 +72,20 @@ class MyHomePageState extends State<MyHomePage> {
                   Anime? existingAnime;
 
                   bool foundAnime = false;
-                  animeOldStorage?[weekday]?.forEach((e) {
-                    if (e.animeId == anime.animeId) {
-                      existingAnime = e;
+                  for (int i = animeOldStorage![weekday]!.length - 1; i >= 0; i--) {
+                    if (animeOldStorage[weekday]?[i].animeId == anime.animeId) {
+                      existingAnime = animeOldStorage[weekday]?[i];
                       foundAnime = true;
+                      break; 
                     }
-                  });
+                  }
 
                   if (!foundAnime) {
-                    animeOldStorage?[weekday]?.add(anime);
+                    animeOldStorage[weekday]?.add(anime);
                   }
 
                   if (existingAnime != null) {
-                    anime.notification = existingAnime!.notification;
+                    anime.notification = existingAnime.notification;
                   }
                 }
               }
