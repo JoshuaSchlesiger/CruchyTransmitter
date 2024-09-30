@@ -72,11 +72,13 @@ class MyHomePageState extends State<MyHomePage> {
                   Anime? existingAnime;
 
                   bool foundAnime = false;
-                  for (int i = animeOldStorage![weekday]!.length - 1; i >= 0; i--) {
+                  for (int i = animeOldStorage![weekday]!.length - 1;
+                      i >= 0;
+                      i--) {
                     if (animeOldStorage[weekday]?[i].animeId == anime.animeId) {
                       existingAnime = animeOldStorage[weekday]?[i];
                       foundAnime = true;
-                      break; 
+                      break;
                     }
                   }
 
@@ -134,16 +136,17 @@ class MyHomePageState extends State<MyHomePage> {
 
   Future<void> _updateAnime(Anime anime) async {
     final SharedPreferences prefs = await _prefs;
-    await updateSingleAnimeInSharedPreferences(anime, prefs);
+    final bool notification = await updateSingleAnimeInSharedPreferences(anime, prefs);
 
-    final String? animeDataString = prefs.getString(_storageKeyAnimeData);
-    if (animeDataString != null) {
-      final Map<String, dynamic> jsonMap = jsonDecode(animeDataString);
-      _animeData = Map<Weekday, List<Anime>>.from(jsonMap.map(
-        (key, value) => MapEntry(WeekdayExtension.fromString(key),
-            (value as List).map((e) => Anime.fromJsonInStorage(e)).toList()),
-      ));
-    }
+    _animeData?.forEach((weekday, animeList) {
+        for (Anime animeEntry in animeList) {
+          if(animeEntry.animeId == anime.animeId) {
+            animeEntry.notification = notification;
+            break;
+          }
+        }
+    });
+
     setState(() {
       _animeData = _animeData;
     });

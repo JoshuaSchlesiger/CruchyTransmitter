@@ -38,24 +38,26 @@ Map<Weekday, List<Anime>> groupAnimeByWeekday(List<Anime> animeList) {
   return animeMap;
 }
 
-Map<Weekday, List<Anime>> sortAnimeByWeekdayAndTime(Map<Weekday, List<Anime>> animeData) {
+Map<Weekday, List<Anime>> sortAnimeByWeekdayAndTime(
+    Map<Weekday, List<Anime>> animeData) {
   final currentWeekday = DateTime.now().weekday;
-  
+
   final orderedWeekdays = Weekday.values
       .where((weekday) => animeData.containsKey(weekday))
       .toList();
-  
+
   final rotatedWeekdays = orderedWeekdays.sublist(currentWeekday - 1)
-      ..addAll(orderedWeekdays.sublist(0, currentWeekday - 1));
-  
+    ..addAll(orderedWeekdays.sublist(0, currentWeekday - 1));
+
   final sortedAnimeData = <Weekday, List<Anime>>{};
-  
+
   rotatedWeekdays.forEach((weekday) {
     final animeList = animeData[weekday] ?? [];
-    animeList.sort((a, b) => a.episode.releaseTime.compareTo(b.episode.releaseTime));
+    animeList
+        .sort((a, b) => a.episode.releaseTime.compareTo(b.episode.releaseTime));
     sortedAnimeData[weekday] = animeList;
   });
-  
+
   return sortedAnimeData;
 }
 
@@ -70,8 +72,10 @@ Future<void> saveAnimeDataToSharedPreferences(
   prefs.setString(storageKeyAnimeData, jsonString);
 }
 
-Future<void> updateSingleAnimeInSharedPreferences(
+Future<bool> updateSingleAnimeInSharedPreferences(
     Anime anime, SharedPreferences prefs) async {
+  bool returnValue = false;
+
   final String? jsonString = prefs.getString('animeData');
 
   final Map<String, dynamic> decodedData = jsonDecode(jsonString!);
@@ -91,6 +95,7 @@ Future<void> updateSingleAnimeInSharedPreferences(
       ?.indexWhere((element) => element.animeId == anime.animeId);
   if (index != null && index != -1) {
     animeData[weekday]?[index] = anime;
+    returnValue = anime.notification;
   }
 
   final updatedJsonString = jsonEncode(animeData.map((key, value) {
@@ -99,4 +104,5 @@ Future<void> updateSingleAnimeInSharedPreferences(
   }));
 
   await prefs.setString('animeData', updatedJsonString);
+  return returnValue;
 }
