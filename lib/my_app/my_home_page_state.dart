@@ -67,18 +67,21 @@ class MyHomePageState extends State<MyHomePage> {
             ));
 
             _animeData?.forEach((weekday, animeList) {
-              if (animeOldStorage?[weekday] != null) {
+              if (animeOldStorage != null && animeOldStorage[weekday] != null) {
                 for (Anime anime in animeList) {
                   Anime? existingAnime;
 
                   bool foundAnime = false;
-                  for (int i = animeOldStorage![weekday]!.length - 1;
-                      i >= 0;
-                      i--) {
-                    if (animeOldStorage[weekday]?[i].animeId == anime.animeId) {
-                      existingAnime = animeOldStorage[weekday]?[i];
-                      foundAnime = true;
-                      break;
+                  if (animeOldStorage[weekday]!.isNotEmpty) {
+                    for (int i = animeOldStorage[weekday]!.length - 1;
+                        i >= 0;
+                        i--) {
+                      if (animeOldStorage[weekday]?[i].animeId ==
+                          anime.animeId) {
+                        existingAnime = animeOldStorage[weekday]?[i];
+                        foundAnime = true;
+                        break;
+                      }
                     }
                   }
 
@@ -136,15 +139,16 @@ class MyHomePageState extends State<MyHomePage> {
 
   Future<void> _updateAnime(Anime anime) async {
     final SharedPreferences prefs = await _prefs;
-    final bool notification = await updateSingleAnimeInSharedPreferences(anime, prefs);
+    final bool notification =
+        await updateSingleAnimeInSharedPreferences(anime, prefs);
 
     _animeData?.forEach((weekday, animeList) {
-        for (Anime animeEntry in animeList) {
-          if(animeEntry.animeId == anime.animeId) {
-            animeEntry.notification = notification;
-            break;
-          }
+      for (Anime animeEntry in animeList) {
+        if (animeEntry.animeId == anime.animeId) {
+          animeEntry.notification = notification;
+          break;
         }
+      }
     });
 
     setState(() {

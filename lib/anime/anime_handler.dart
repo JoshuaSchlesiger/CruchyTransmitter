@@ -46,8 +46,10 @@ Map<Weekday, List<Anime>> sortAnimeByWeekdayAndTime(
       .where((weekday) => animeData.containsKey(weekday))
       .toList();
 
-  final rotatedWeekdays = orderedWeekdays.sublist(currentWeekday - 1)
-    ..addAll(orderedWeekdays.sublist(0, currentWeekday - 1));
+  final rotatedWeekdays = orderedWeekdays
+      .sublist((currentWeekday - 1) % orderedWeekdays.length)
+    ..addAll(orderedWeekdays.sublist(
+        0, (currentWeekday - 1) % orderedWeekdays.length));
 
   final sortedAnimeData = <Weekday, List<Anime>>{};
 
