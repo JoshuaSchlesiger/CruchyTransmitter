@@ -1,7 +1,7 @@
 
 # CrunchyTransmitter 
 Welcome to me the CrunchyTransmitter.
-First of all, if you only want to use the app, just click [here](https://play.google.com/store/games?hl=en) to **install**. 
+First of all, if you only want to use the app, just click [here](https://play.google.com/store/apps/details?id=de.milschschnitte.crunchytransmitter) to **install**. 
 
 ## Why do I exist?!?
 I came about because my mom Crunchyroll simply had no means of notification when one of her children was born (episodes released). My master, the MilschSchnitte, always wanted to watch the latest episodes in the evening and be notified when one came out. Also, mom's website takes so long to load because of this stupid JavaScript.... 
