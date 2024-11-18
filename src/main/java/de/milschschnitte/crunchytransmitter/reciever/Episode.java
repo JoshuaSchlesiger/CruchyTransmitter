@@ -57,7 +57,7 @@ public class Episode {
             
             this.releaseTime = Timestamp.valueOf(LocalDateTime.of(this.dateOfWeekday.toLocalDate(), releaseLocalTime));
         } catch (Exception e) {
-            logger.warn("faulty releaseTime: " + releaseTime );
+            throw new RuntimeException("faulty releaseTime: " + releaseTime );
         }
 
     }
@@ -81,8 +81,7 @@ public class Episode {
         }
 
         if (startIndex == -1) {
-            logger.error("Cannot find digit of Date in CorrectionDate: " + correctionDate);
-            return;
+            throw new RuntimeException("Cannot find digit of Date in CorrectionDate: " + correctionDate);
         }
         
         String datePart = correctionDate.substring(startIndex).trim();

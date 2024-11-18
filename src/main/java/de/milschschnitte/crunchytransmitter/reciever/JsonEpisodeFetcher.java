@@ -20,12 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class for extracting the information from the json provided by the Crunchyroll website
+ * Class for extracting the information from the json provided by the
+ * Crunchyroll website
  */
 public class JsonEpisodeFetcher {
     private Logger logger = LoggerFactory.getLogger(JsonEpisodeFetcher.class);
     private List<Anime> animeList = new ArrayList<Anime>();
-    
+
     /**
      * 
      * @param seasonURL
@@ -49,14 +50,14 @@ public class JsonEpisodeFetcher {
             e.printStackTrace();
         }
 
-        if(animeList.size() == 0){
+        if (animeList.size() == 0) {
             logger.error("Did not find any animes after process");
         }
-        
+
         return animeList;
     }
 
-    private void processEntity(HttpEntity entity) throws UnsupportedOperationException, IOException{
+    private void processEntity(HttpEntity entity) throws UnsupportedOperationException, IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent()));
         StringBuilder result = new StringBuilder();
 
@@ -66,54 +67,65 @@ public class JsonEpisodeFetcher {
         }
         ObjectMapper objectMapper = new ObjectMapper();
 
-        //Main json
+        // Main json
         JsonNode rootNode = objectMapper.readTree(result.toString());
-        //Body of JSON
+        // Body of JSON
         JsonNode bodyNode = rootNode.get("story").get("content").get("body");
         if (bodyNode.isArray()) {
-            //Storing current weekday for processing
+            // Storing current weekday for processing
             EnumWeekdays weekday = null;
 
-            //Used to skip ever element util monday is there
+            // Used to skip ever element util monday is there
             Boolean mondayFound = false;
 
-            //Idk why i star with 1, maybe 0 is possible too ?
+            // Idk why i star with 1, maybe 0 is possible too ?
             for (int i = 1; i < bodyNode.size(); i++) {
                 JsonNode elementNode = bodyNode.get(i);
 
-                //Check weekdays, continue until monday is found
+                // Check weekdays, continue until monday is found
                 try {
-                    JsonNode weekdayNode = elementNode.get("content").get("content").get(0).get("content").get(0).get("text");
-                    //Filter end of sunday
-                    if(weekdayNode.asText().equals("Katalogtitel")){
+                    JsonNode weekdayNode = elementNode.get("content").get("content").get(0).get("content").get(0)
+                            .get("text");
+
+                    // Filter end of sunday
+                    if (weekdayNode.asText().equals("Katalogtitel")) {
                         break;
                     }
 
                     weekday = EnumWeekdays.fromGermanName(weekdayNode.asText());
-                    //Filter everything until monday
-                    if (weekday == null) continue;
-                    if (weekday == EnumWeekdays.MONDAY) mondayFound = true;
+                    // Filter everything until monday
+                    if (weekday == null)
+                        continue;
 
+                    if (weekday == EnumWeekdays.MONDAY)
+                        mondayFound = true;
                     continue;
                 } catch (NullPointerException e) {
                 }
 
-                if(mondayFound == false) continue;
+                if (mondayFound == false)
+                    continue;
 
                 try {
                     JsonNode animeEpisodeNode = elementNode.get("items");
                     for (JsonNode animeEpisode : animeEpisodeNode) {
-                        String animeHTML = animeEpisode.get("table").get("content").toString();
+                        JsonNode animeItem = animeEpisode.get("content");
 
-                        //Mainprocess to process html inside of json element. Result is used to put inside of db
-                        animeList.addAll(AnimeInfoExtractor.extractAnime(animeHTML, weekday));
+                        try {
+                            Anime anime = AnimeInfoExtractor.extractAnime(animeItem, weekday);
+                            if (anime != null)
+                                animeList.add(anime);
+                        } catch (Exception e) {
+                            logger.warn("SHIT : ", e);
+                        }
                     }
-                    continue;
+
                 } catch (NullPointerException e) {
+                    logger.warn("Exception occurred while processing entity", e);
                 }
             }
         } else {
-          logger.error("Major problem at processing json of crunchyroll");                  
+            logger.error("Major problem at processing json of crunchyroll");
         }
     }
 }
