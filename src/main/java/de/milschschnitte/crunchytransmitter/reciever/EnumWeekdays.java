@@ -67,14 +67,32 @@ public enum EnumWeekdays {
     public static boolean isInCurrentWeek(Date date) {
         Calendar calendar = Calendar.getInstance(Locale.GERMANY);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
         calendar.setTime(date);
-        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        int dateWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        int dateYear = calendar.get(Calendar.YEAR);
 
         Calendar today = Calendar.getInstance(Locale.GERMANY);
         today.setFirstDayOfWeek(Calendar.MONDAY);
+        today.setMinimalDaysInFirstWeek(4);
+        int currentWeek = today.get(Calendar.WEEK_OF_YEAR);
         int currentYear = today.get(Calendar.YEAR);
-        int currentWeekOfYear = today.get(Calendar.WEEK_OF_YEAR);
 
-        return calendar.get(Calendar.YEAR) == currentYear && currentWeek == currentWeekOfYear;
+        // Check if the date is in the same week as today
+        if (dateYear == currentYear && dateWeek == currentWeek) {
+            return true;
+        }
+
+        // Check if the date is in the first week of the year and today is in the last week of the previous year
+        if (dateYear == currentYear - 1 && dateWeek == today.getActualMaximum(Calendar.WEEK_OF_YEAR) && currentWeek == 1) {
+            return true;
+        }
+
+        // Check if the date is in the last week of the year and today is in the first week of the next year
+        if (dateYear == currentYear + 1 && dateWeek == 1 && currentWeek == today.getActualMaximum(Calendar.WEEK_OF_YEAR)) {
+            return true;
+        }
+
+        return false;
     }
 }

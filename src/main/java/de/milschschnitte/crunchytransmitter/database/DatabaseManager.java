@@ -61,7 +61,8 @@ public class DatabaseManager {
                     String existingImageUrl = resultSet.getString("imageurl");
                     String existingCrunchyrollurl = resultSet.getString("crunchyrollurl");
 
-                    if (!existingImageUrl.equals(anime.getImageUrl())) {
+                    if ((existingImageUrl == null && anime.getImageUrl() != null) ||
+                            (existingImageUrl != null && !existingImageUrl.equals(anime.getImageUrl()))) {
                         try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
                             updateStatement.setString(1, anime.getImageUrl());
                             updateStatement.setString(2, anime.getCrunchyrollUrl());
@@ -70,7 +71,9 @@ public class DatabaseManager {
 
                             logger.info("Updated anime: " + id + ", notification will be send");
                         }
-                    } else if (!existingCrunchyrollurl.equals(anime.getCrunchyrollUrl())) {
+                    } else if ((existingCrunchyrollurl == null && anime.getCrunchyrollUrl() != null) ||
+                            (existingCrunchyrollurl != null
+                                    && !existingCrunchyrollurl.equals(anime.getCrunchyrollUrl()))) {
                         try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
                             updateStatement.setString(1, anime.getImageUrl());
                             updateStatement.setString(2, anime.getCrunchyrollUrl());
@@ -83,6 +86,9 @@ public class DatabaseManager {
 
                     return id;
                 }
+
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
             }
 
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
@@ -96,8 +102,13 @@ public class DatabaseManager {
                 } else {
                     throw new SQLException("Inserting anime failed, no ID obtained.");
                 }
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
             }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
         }
+        throw new SQLException("Inserting anime failed, no ID obtained.");
     }
 
     public static int insertOrUpdateEpisode(int animeId, Episode episode) throws SQLException {
@@ -116,7 +127,7 @@ public class DatabaseManager {
                 ResultSet resultSet = selectStatement.executeQuery();
 
                 while (resultSet.next()) {
-                
+
                     Date existingDateOfWeekday = resultSet.getDate("dateOfWeekday");
                     String episodeResult = resultSet.getString("episode");
                     Date existingCorrectionDate = resultSet.getDate("dateOfCorrectionDate");
@@ -127,8 +138,7 @@ public class DatabaseManager {
 
                         Timestamp existingReleaseTime = resultSet.getTimestamp("releaseTime");
 
-
-                        if(!episodeResult.equals(episode.getEpisode())){
+                        if (!episodeResult.equals(episode.getEpisode())) {
                             return -1;
                         }
 
@@ -172,11 +182,12 @@ public class DatabaseManager {
                         }
 
                         return id;
-                    }
-                    else if(episodeResult.equals(episode.getEpisode()) && existingCorrectionDate == null){
+                    } else if (episodeResult.equals(episode.getEpisode()) && existingCorrectionDate == null) {
                         return -1;
                     }
                 }
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
             }
 
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
@@ -195,8 +206,13 @@ public class DatabaseManager {
                 } else {
                     throw new SQLException("Inserting episode failed, no ID obtained.");
                 }
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
             }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
         }
+        throw new SQLException("Inserting episode failed, no ID obtained.");
     }
 
     public static List<Anime> getNotifiableAnime() {

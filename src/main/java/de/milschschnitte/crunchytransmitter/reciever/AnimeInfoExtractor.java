@@ -26,19 +26,19 @@ public class AnimeInfoExtractor {
         String imageUrl = animeImageNode.get("attrs").get("src").asText();
         anime.setImageUrl(imageUrl.replace("\"", ""));
 
+        // Title
+        JsonNode animeTitleNode = animeBaseNode.get(1);
+        String title = animeTitleNode.get("content").get(0).get("text").asText();
+        anime.setTitle(title);
+
         // Link to anime, can be null
         try {
             String animeURL = animeImageNode.get("marks").get(0).get("attrs").get("href").asText();
             anime.setCrunchyrollUrl(animeURL.replace("\"", ""));
         } catch (Exception e) {
             anime.setCrunchyrollUrl("");
-            logger.warn("No crunchyroll link found for anime: " + anime.getTitle());
+            logger.info("No crunchyroll link found for anime: " + anime.getTitle());
         }
-
-        // Title
-        JsonNode animeTitleNode = animeBaseNode.get(1);
-        String title = animeTitleNode.get("content").get(0).get("text").asText();
-        anime.setTitle(title);
 
         // Episode
         JsonNode animeEpisodeNode = animeBaseNode.get(2);
@@ -49,10 +49,19 @@ public class AnimeInfoExtractor {
                 return null;
             }
         } catch (Exception e) {
-            logger.warn("animetile: " + title + " has no language flag");
+            logger.info("animetile: " + title + " has no language flag " + e.getMessage());
+            return null;
         }
 
-        String episodeRaw = animeEpisodeNode.get("content").get(1).get("text").asText();
+        String episodeRaw = null;
+
+        try {
+            episodeRaw = animeEpisodeNode.get("content").get(1).get("text").asText();
+        } catch (Exception e) {
+            logger.info("Faulty episodeRaw, title: " + title + " " + e.getMessage());
+            return null;
+        }
+
         episodeRaw = episodeRaw.replace("\"", "");
 
         int length = episodeRaw.length();
@@ -68,25 +77,25 @@ public class AnimeInfoExtractor {
         }
 
         String episodeText = episodeRaw.substring(episodeRaw.indexOf('F'));
+        episode.setEpisodes(episodeText);
 
-        if (episodeText.endsWith("*")) {
+        String releaseTimeRaw = animeEpisodeNode.get("content").get(3).get("text").asText();
+        if (releaseTimeRaw.endsWith("*")) {
+            releaseTimeRaw = releaseTimeRaw.substring(0, releaseTimeRaw.length() - 1);
             try {
-                episode.setDateOfCorrectionDate(animeEpisodeNode.get("content").get(3).get("text").asText());
+                episode.setDateOfCorrectionDate(animeEpisodeNode.get("content").get(5).get("text").asText());
             } catch (Exception e) {
-                //if not a date e.g. "im dezember"
-                return null;
-            }
-        } else {
-            try {
-                episode.setReleaseTime(animeEpisodeNode.get("content").get(3).get("text").asText());
-            } catch (Exception e) {
-                // If the release TIem is "veröffentlicht"
-                return null;
+                // if not a date e.g. "im dezember"
             }
         }
 
-        episodeText = episodeText.replace("*", "");
-        episode.setEpisodes(episodeText);
+        try {
+            episode.setReleaseTime(releaseTimeRaw);
+        } catch (Exception e) {
+            // If the release TIem is "veröffentlicht"
+            return null;
+        }
+
 
         return anime;
     }
