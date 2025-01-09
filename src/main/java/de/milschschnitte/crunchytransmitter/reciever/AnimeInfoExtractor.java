@@ -46,6 +46,7 @@ public class AnimeInfoExtractor {
         try {
             String languageFlag = animeEpisodeNode.get("content").get(0).get("attrs").get("src").asText();
             if (languageFlag.contains("deutschland-flagge")) {
+                logger.info("language flag: " + languageFlag);
                 return null;
             }
         } catch (Exception e) {
@@ -93,6 +94,7 @@ public class AnimeInfoExtractor {
             episode.setReleaseTime(releaseTimeRaw);
         } catch (Exception e) {
             // If the release TIem is "veröffentlicht"
+            logger.info("Faulty releaseTimeRaw, skip anime title: " + title);
             return null;
         }
 

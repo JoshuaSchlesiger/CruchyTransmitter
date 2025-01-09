@@ -13,7 +13,7 @@ public class Anime {
         this.imageUrl = "";
     }
 
-    public Anime(Episode episode, Integer animeId, String title, String imageUrl, String crunchyrollUrl){
+    public Anime(Episode episode, Integer animeId, String title, String imageUrl, String crunchyrollUrl) {
         this.episode = episode;
         this.animeId = animeId;
         this.title = title;
@@ -21,11 +21,11 @@ public class Anime {
         this.crunchyrollUrl = crunchyrollUrl;
     }
 
-    public String getCrunchyrollUrl(){
+    public String getCrunchyrollUrl() {
         return this.crunchyrollUrl;
     }
 
-    public int getAnimeId(){
+    public int getAnimeId() {
         return this.animeId;
     }
 
@@ -41,7 +41,7 @@ public class Anime {
         return this.imageUrl;
     }
 
-    public void setAnimeId(Integer id){
+    public void setAnimeId(Integer id) {
         this.animeId = id;
     }
 
@@ -54,7 +54,18 @@ public class Anime {
         this.imageUrl = withoutBackslashes.replace("\"", "");
     }
 
-    public void setCrunchyrollUrl(String crunchyrollUrl){
+    public void setCrunchyrollUrl(String crunchyrollUrl) {
         this.crunchyrollUrl = crunchyrollUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "Anime{" +
+                "animeId=" + (animeId != null ? animeId : "null") +
+                ", title='" + (title != null ? title : "null") + '\'' +
+                ", episode=" + (episode != null ? episode : "null") +
+                ", imageUrl='" + (imageUrl != null ? imageUrl : "null") + '\'' +
+                ", crunchyrollUrl='" + (crunchyrollUrl != null ? crunchyrollUrl : "null") + '\'' +
+                '}';
     }
 }

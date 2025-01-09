@@ -36,7 +36,7 @@ public class NotificationService {
             successfully += sendNotificationBlock(notificationTitle, body, url, blockTokens);
         }
 
-        logger.warn("Sended all notification to users. Sended " + successfully + " successfully");
+        logger.warn("Sended all notification for animeID: " + animeId + " to users. Sended " + successfully + " successfully");
     }
 
     private static Integer sendNotificationBlock(String notificationTitle, String body, String url,

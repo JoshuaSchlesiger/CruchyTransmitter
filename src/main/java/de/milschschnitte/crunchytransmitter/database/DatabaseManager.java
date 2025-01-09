@@ -293,7 +293,7 @@ public class DatabaseManager {
             }
         }
 
-        String selectQueryEpisode = "SELECT id, anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE releaseTime >= ? AND releaseTime <= ?";
+        String selectQueryEpisode = "SELECT id, anime_id, episode, releaseTime, dateOfWeekday, dateOfCorrectionDate FROM episodes WHERE dateofweekday >= ? AND dateofweekday <= ?";
 
         try (Connection connection = getConnection()) {
             try (PreparedStatement selectStatement = connection.prepareStatement(selectQueryEpisode)) {
