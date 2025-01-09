@@ -49,93 +49,92 @@ class MyHomePageState extends State<MyHomePage> {
     });
 
     _prefs.then((prefs) async {
-      try {
-        _animeData = await fetchAndGroupAnimeByWeekday();
+      // try {
+      _animeData = await fetchAndGroupAnimeByWeekday();
 
-        Map<Weekday, List<Anime>>? animeOldStorage;
-        if (_animeData != null && _animeData!.isNotEmpty) {
-          final String? animeDataStringOld =
-              prefs.getString(_storageKeyAnimeData);
+      Map<Weekday, List<Anime>>? animeOldStorage;
+      if (_animeData != null && _animeData!.isNotEmpty) {
+        final String? animeDataStringOld =
+            prefs.getString(_storageKeyAnimeData);
 
-          if (animeDataStringOld != null) {
-            final Map<String, dynamic> jsonMap = jsonDecode(animeDataStringOld);
-            animeOldStorage = Map<Weekday, List<Anime>>.from(jsonMap.map(
-              (key, value) => MapEntry(
-                  WeekdayExtension.fromString(key),
-                  (value as List)
-                      .map((e) => Anime.fromJsonInStorage(e))
-                      .toList()),
-            ));
+        if (animeDataStringOld != null) {
+          final Map<String, dynamic> jsonMap = jsonDecode(animeDataStringOld);
+          animeOldStorage = Map<Weekday, List<Anime>>.from(jsonMap.map(
+            (key, value) => MapEntry(
+                WeekdayExtension.fromString(key),
+                (value as List)
+                    .map((e) => Anime.fromJsonInStorage(e))
+                    .toList()),
+          ));
 
-            _animeData?.forEach((weekday, animeList) {
-              if (animeOldStorage != null && animeOldStorage[weekday] != null) {
-                for (Anime anime in animeList) {
-                  Anime? existingAnime;
+          _animeData?.forEach((weekday, animeList) {
+            if (animeOldStorage != null && animeOldStorage[weekday] != null) {
+              for (Anime anime in animeList) {
+                Anime? existingAnime;
 
-                  bool foundAnime = false;
-                  if (animeOldStorage[weekday]!.isNotEmpty) {
-                    for (int i = animeOldStorage[weekday]!.length - 1;
-                        i >= 0;
-                        i--) {
-                      if (animeOldStorage[weekday]?[i].animeId ==
-                          anime.animeId) {
-                        existingAnime = animeOldStorage[weekday]?[i];
-                        foundAnime = true;
-                        break;
-                      }
+                bool foundAnime = false;
+                if (animeOldStorage[weekday]!.isNotEmpty) {
+                  for (int i = animeOldStorage[weekday]!.length - 1;
+                      i >= 0;
+                      i--) {
+                    if (animeOldStorage[weekday]?[i].animeId == anime.animeId) {
+                      existingAnime = animeOldStorage[weekday]?[i];
+                      foundAnime = true;
+                      break;
                     }
                   }
+                }
 
-                  if (!foundAnime) {
-                    animeOldStorage[weekday]?.add(anime);
-                  }
+                if (!foundAnime) {
+                  animeOldStorage[weekday]?.add(anime);
+                }
 
-                  if (existingAnime != null) {
-                    anime.notification = existingAnime.notification;
-                  }
+                if (existingAnime != null) {
+                  anime.notification = existingAnime.notification;
                 }
               }
-            });
-          }
-
-          _animeData = sortAnimeByWeekdayAndTime(_animeData!);
-          if (animeOldStorage != null) {
-            animeOldStorage = sortAnimeByWeekdayAndTime(animeOldStorage);
-            saveAnimeDataToSharedPreferences(
-                animeOldStorage, prefs, _storageKeyAnimeData);
-          } else {
-            saveAnimeDataToSharedPreferences(
-                _animeData!, prefs, _storageKeyAnimeData);
-          }
-
-          //Filter option on top is save for next app open
-          final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
-          if (filterIndex != null) {
-            selectedIndex = filterIndex;
-          }
-
-          setState(() {
-            _isLoading = false;
+            }
           });
-        } else {
-          runApp(const NoInternetApp(
-              title: "CrunchyTransmitter",
-              text:
-                  'Aktuell hat Crunchyroll noch keinen Wochenplan veröffentlicht, bitte versuche es später erneut.'));
         }
-      } catch (e) {
-        if (e.toString().contains("CERTIFICATE")) {
-          runApp(const NoInternetApp(
-              title: "CrunchyTransmitter",
-              text:
-                  'Ein Fehler ist mit dem Zertifikat aufgetreten. Bitte versuche es mit einer anderen Internetverbindung.'));
+
+        _animeData = sortAnimeByWeekdayAndTime(_animeData!);
+        if (animeOldStorage != null) {
+          animeOldStorage = sortAnimeByWeekdayAndTime(animeOldStorage);
+          saveAnimeDataToSharedPreferences(
+              animeOldStorage, prefs, _storageKeyAnimeData);
         } else {
-          runApp(NoInternetApp(
-              title: "CrunchyTransmitter",
-              text:
-                  'Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut. Fehlermeldung: $e'));
+          saveAnimeDataToSharedPreferences(
+              _animeData!, prefs, _storageKeyAnimeData);
         }
+
+        //Filter option on top is save for next app open
+        final int? filterIndex = prefs.getInt(_storageKeyFilterIndex);
+        if (filterIndex != null) {
+          selectedIndex = filterIndex;
+        }
+
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        runApp(const NoInternetApp(
+            title: "CrunchyTransmitter",
+            text:
+                'Aktuell hat Crunchyroll noch keinen Wochenplan veröffentlicht, bitte versuche es später erneut.'));
       }
+      // } catch (e) {
+      //   if (e.toString().contains("CERTIFICATE")) {
+      //     runApp(const NoInternetApp(
+      //         title: "CrunchyTransmitter",
+      //         text:
+      //             'Ein Fehler ist mit dem Zertifikat aufgetreten. Bitte versuche es mit einer anderen Internetverbindung.'));
+      //   } else {
+      //     runApp(NoInternetApp(
+      //         title: "CrunchyTransmitter",
+      //         text:
+      //             'Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut. Fehlermeldung: $e'));
+      //   }
+      // }
     });
   }
 
@@ -400,9 +399,9 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   Widget buildGridItem(Anime anime) {
-    final int releaseHour = anime.episode.releaseTime.hour;
-    final String releaseMinute =
-        anime.episode.releaseTime.minute.toString().padLeft(2, '0');
+    final int? releaseHour = anime.episode.releaseTime?.hour;
+    final String? releaseMinute =
+        anime.episode.releaseTime?.minute.toString().padLeft(2, '0');
 
     final Map<int, String> germanMonths = {
       1: 'Januar',
@@ -522,12 +521,21 @@ class MyHomePageState extends State<MyHomePage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  '$releaseHour:$releaseMinute Uhr',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                if (releaseHour != null &&
+                                    releaseMinute != null)
+                                  Text(
+                                    '$releaseHour:$releaseMinute Uhr',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                else
+                                  const Text(
+                                    'Noch nicht bekannt',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
                                 Text(
                                   anime.episode.episode,
                                   style: const TextStyle(

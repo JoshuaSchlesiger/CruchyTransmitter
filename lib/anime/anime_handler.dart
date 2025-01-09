@@ -29,7 +29,8 @@ Future<List<Anime>?> fetchData() async {
 Map<Weekday, List<Anime>> groupAnimeByWeekday(List<Anime> animeList) {
   Map<Weekday, List<Anime>> animeMap = {};
   for (final anime in animeList) {
-    final weekday = WeekdayExtension.getWeekdayName(anime.episode.releaseTime);
+
+    final weekday = WeekdayExtension.getWeekdayName(anime.episode.dateOfWeekday);
     if (!animeMap.containsKey(weekday)) {
       animeMap[weekday] = [];
     }
@@ -53,8 +54,11 @@ Map<Weekday, List<Anime>> sortAnimeByWeekdayAndTime(
 
   for (final weekday in rotatedWeekdays) {
     final animeList = animeData[weekday] ?? [];
-    animeList
-        .sort((a, b) => a.episode.releaseTime.compareTo(b.episode.releaseTime));
+    animeList.sort((a, b) {
+      if (a.episode.releaseTime == null) return 1;
+      if (b.episode.releaseTime == null) return -1;
+      return a.episode.releaseTime!.compareTo(b.episode.releaseTime!);
+    });
     sortedAnimeData[weekday] = animeList;
   }
 
@@ -90,7 +94,7 @@ Future<bool> updateSingleAnimeInSharedPreferences(
     }),
   );
 
-  final weekday = WeekdayExtension.getWeekdayName(anime.episode.releaseTime);
+  final weekday = WeekdayExtension.getWeekdayName(anime.episode.dateOfWeekday);
   final index = animeData[weekday]
       ?.indexWhere((element) => element.animeId == anime.animeId);
   if (index != null && index != -1) {
