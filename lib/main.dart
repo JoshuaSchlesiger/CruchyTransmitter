@@ -16,7 +16,7 @@ Future<void> main() async {
       connectivityResult == ConnectivityResult.wifi);
 
   if (!isConnected) {
-    runApp(const NoInternetApp());
+    runApp(const NoInternetApp(title: "CrunchyTransmitter", text: 'Keine Internetverbindung. Bitte verbinde dich mit dem Internet und versuche es erneut.'));
   } else {
     // Google FCM init
     await Firebase.initializeApp();

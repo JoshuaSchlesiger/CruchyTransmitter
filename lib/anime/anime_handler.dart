@@ -42,23 +42,21 @@ Map<Weekday, List<Anime>> sortAnimeByWeekdayAndTime(
     Map<Weekday, List<Anime>> animeData) {
   final currentWeekday = DateTime.now().weekday;
 
-  final orderedWeekdays = Weekday.values
-      .where((weekday) => animeData.containsKey(weekday))
-      .toList();
+  const allWeekdays = Weekday.values;
 
-  final rotatedWeekdays = orderedWeekdays
-      .sublist((currentWeekday - 1) % orderedWeekdays.length)
-    ..addAll(orderedWeekdays.sublist(
-        0, (currentWeekday - 1) % orderedWeekdays.length));
+  final rotatedWeekdays = allWeekdays
+      .skip(currentWeekday - 1)
+      .followedBy(allWeekdays.take(currentWeekday - 1))
+      .toList();
 
   final sortedAnimeData = <Weekday, List<Anime>>{};
 
-  rotatedWeekdays.forEach((weekday) {
+  for (final weekday in rotatedWeekdays) {
     final animeList = animeData[weekday] ?? [];
     animeList
         .sort((a, b) => a.episode.releaseTime.compareTo(b.episode.releaseTime));
     sortedAnimeData[weekday] = animeList;
-  });
+  }
 
   return sortedAnimeData;
 }

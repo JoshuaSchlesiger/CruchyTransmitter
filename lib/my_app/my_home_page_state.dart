@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:crunchy_transmitter/subpages/info_page.dart';
+import 'package:crunchy_transmitter/subpages/no_internet_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'my_home_page.dart';
@@ -117,16 +118,22 @@ class MyHomePageState extends State<MyHomePage> {
             _isLoading = false;
           });
         } else {
-          errorDialog(
-              "Aktuell hat Crunchyroll noch keinen Wochenplan veröffentlicht, bitte versuche es später erneut.");
+          runApp(const NoInternetApp(
+              title: "CrunchyTransmitter",
+              text:
+                  'Aktuell hat Crunchyroll noch keinen Wochenplan veröffentlicht, bitte versuche es später erneut.'));
         }
       } catch (e) {
         if (e.toString().contains("CERTIFICATE")) {
-          errorDialog(
-              "Ein Fehler ist mit dem Zertifikat aufgetreten. Bitte versuche es mit einer anderen Internetverbindung.");
+          runApp(const NoInternetApp(
+              title: "CrunchyTransmitter",
+              text:
+                  'Ein Fehler ist mit dem Zertifikat aufgetreten. Bitte versuche es mit einer anderen Internetverbindung.'));
         } else {
-          errorDialog(
-              "Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut. Fehlermeldung: $e");
+          runApp(NoInternetApp(
+              title: "CrunchyTransmitter",
+              text:
+                  'Es gab einen Fehler beim Laden der Animedaten. Bitte probiere es später erneut. Fehlermeldung: $e'));
         }
       }
     });
